@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>지구를 구하는 과학 싱크탱크 — 탐구 제안서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --bg3: #1a1a24;
+    --card: #13131c;
+    --card-hover: #1c1c28;
+    --border: rgba(255,255,255,0.07);
+    --border-bright: rgba(255,255,255,0.15);
+    --text: #e8e8f0;
+    --text-dim: #7a7a9a;
+    --text-dimmer: #4a4a6a;
+    --accent: #5b8aff;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+
+    --bio:     #34d399;
+    --food:    #a3e635;
+    --ocean:   #3b82f6;
+    --health:  #ec4899;
+    --energy:  #fbbf24;
+    --disaster:#f87171;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 400;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─────────────────────────────────── */
+  .site-header {
+    border-bottom: 1px solid var(--border);
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(12px);
+  }
+  .site-header .school {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .site-header .year {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .1em;
+    color: var(--text-dimmer);
+  }
+
+  /* ─── HERO ────────────────────────────────────── */
+  .hero {
+    padding: 80px 40px 60px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .hero .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .25em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: clamp(20px, 3.5vw, 30px);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -.01em;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .hero .proposal-big {
+    font-size: clamp(44px, 10vw, 92px);
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -.03em;
+    margin: 6px 0 22px;
+    background: linear-gradient(120deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero h2 {
+    font-size: clamp(14px, 2vw, 18px);
+    font-weight: 300;
+    color: var(--text-dim);
+    letter-spacing: .02em;
+  }
+
+  /* ─── TYPE LEGEND ─────────────────────────────── */
+  .legend-section {
+    max-width: 900px;
+    margin: 0 auto 60px;
+    padding: 0 40px;
+  }
+  .legend-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .2em;
+    color: var(--text-dimmer);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .legend-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .legend-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .legend-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .legend-label { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+  .legend-desc { font-size: 11px; color: var(--text-dim); line-height: 1.5; }
+  .legend-note {
+    grid-column: 1/-1;
+    padding: 12px 20px;
+    background: rgba(91,138,255,.08);
+    border: 1px solid rgba(91,138,255,.2);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--accent);
+    text-align: center;
+    letter-spacing: .02em;
+  }
+
+  /* ─── TOPIC SECTIONS ──────────────────────────── */
+  .topics { max-width: 900px; margin: 0 auto; padding: 0 40px 80px; }
+
+  .topic-block {
+    margin-bottom: 14px;
+    transition: margin-bottom .2s;
+  }
+  .topic-block.open { margin-bottom: 48px; }
+
+  .topic-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 0;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    transition: border-color .2s;
+  }
+  .topic-header:hover { border-color: var(--border-bright); }
+  .topic-header::after {
+    content: '+';
+    margin-left: auto;
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--text-dimmer);
+    transition: transform .25s, color .2s;
+    flex-shrink: 0;
+  }
+  .topic-header:hover::after { color: var(--text-dim); }
+  .topic-block.open .topic-header { margin-bottom: 24px; }
+  .topic-block.open .topic-header::after { transform: rotate(45deg); }
+  /* 토픽 내용은 기본 접힘, .open 일 때만 표시 */
+  .topic-desc, .inquiry-grid { display: none; }
+  .topic-block.open .topic-desc { display: block; }
+  .topic-block.open .inquiry-grid { display: grid; }
+  .topic-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dimmer);
+    letter-spacing: .1em;
+    white-space: nowrap;
+  }
+  .topic-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .topic-title {
+    font-size: clamp(18px, 3vw, 26px);
+    font-weight: 900;
+    letter-spacing: -.01em;
+  }
+  .topic-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    padding: 16px 20px;
+    background: var(--bg3);
+    border-left: 3px solid var(--border-bright);
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* ─── INQUIRY CARDS ───────────────────────────── */
+  .inquiry-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .inquiry-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .inquiry-card:hover {
+    background: var(--card-hover);
+    border-color: var(--border-bright);
+  }
+  .inquiry-card.open { border-color: var(--border-bright); }
+
+  .card-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    user-select: none;
+  }
+  .card-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dimmer);
+    white-space: nowrap;
+    margin-top: 3px;
+    min-width: 20px;
+  }
+  .card-body { flex: 1; min-width: 0; }
+  .card-type-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .type-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+  .type-exp  { background: rgba(52,211,153,.12); color: #34d399; }
+  .type-meas { background: rgba(251,191,36,.12);  color: #fbbf24; }
+  .type-data { background: rgba(91,138,255,.12);  color: #5b8aff; }
+  .diff-badge {
+    font-size: 10px;
+    color: var(--text-dimmer);
+    letter-spacing: .05em;
+  }
+  .card-question {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
+    word-break: keep-all;
+  }
+  .card-toggle {
+    font-size: 16px;
+    color: var(--text-dimmer);
+    transition: transform .25s;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .inquiry-card.open .card-toggle { transform: rotate(45deg); }
+
+  .card-detail {
+    display: none;
+    padding: 0 20px 18px;
+    border-top: 1px solid var(--border);
+  }
+  .inquiry-card.open .card-detail { display: block; }
+
+  .detail-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .detail-box {
+    background: var(--bg3);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .detail-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .18em;
+    color: var(--text-dimmer);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .detail-text {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.65;
+  }
+  .detail-box.full { grid-column: 1/-1; }
+  .point-box {
+    margin-top: 10px;
+    grid-column: 1/-1;
+    background: rgba(91,138,255,.06);
+    border: 1px solid rgba(91,138,255,.18);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .point-box .detail-label { color: var(--accent); }
+  .point-box .detail-text { color: rgba(200,210,255,.8); }
+
+  /* ─── SUMMARY TABLE ───────────────────────────── */
+  .summary-section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 40px 80px;
+  }
+  .section-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .2em;
+    color: var(--text-dimmer);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .summary-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--text-dimmer);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    white-space: nowrap;
+  }
+  .summary-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .summary-table tr:last-child td { border-bottom: none; }
+  .summary-table tr:hover td { background: var(--bg3); }
+  .topic-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .cnt-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--bg3);
+    color: var(--text-dim);
+  }
+  .cnt-badge.has { background: rgba(91,138,255,.15); color: var(--accent); }
+  .recommend-q {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  /* ─── FOOTER NOTES ────────────────────────────── */
+  .footer-notes {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 40px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .note {
+    font-size: 12px;
+    color: var(--text-dimmer);
+    display: flex;
+    gap: 8px;
+  }
+  .note::before { content: '※'; flex-shrink: 0; color: var(--accent); }
+
+  /* ─── SITE FOOTER ─────────────────────────────── */
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 40px;
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .12em;
+    color: var(--text-dimmer);
+  }
+
+  /* ─── RESPONSIVE ──────────────────────────────── */
+  @media (max-width: 680px) {
+    .site-header { padding: 14px 20px; }
+    .hero { padding: 50px 20px 40px; }
+    .legend-section, .topics, .summary-section, .footer-notes { padding-left: 20px; padding-right: 20px; }
+    .legend-cards { grid-template-columns: 1fr; }
+    .inquiry-grid { grid-template-columns: 1fr; }
+    .detail-row { grid-template-columns: 1fr; }
+    .summary-table { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <span class="school">SCIENCE THINK TANK</span>
+  <span class="year">INQUIRY PROPOSAL</span>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="eyebrow">CLIMATE CHANGE · SCIENCE THINK TANK</p>
+  <h1>🌍 지구를 구하는 과학 싱크탱크</h1>
+  <p class="proposal-big">탐구 제안서</p>
+  <h2>실험 + 측정 + 데이터 분석 통합 탐구 목록</h2>
+</section>
+
+<!-- LEGEND -->
+<section class="legend-section">
+  <p class="legend-title">■ INQUIRY TYPE GUIDE · 탐구 유형 안내</p>
+  <div class="legend-cards">
+    <div class="legend-card">
+      <span class="legend-icon">🧪</span>
+      <div>
+        <div class="legend-label">실험</div>
+        <div class="legend-desc">직접 재료를 이용해 변화를 만들고 측정하는 탐구</div>
+      </div>
+    </div>
+    <div class="legend-card">
+      <span class="legend-icon">📏</span>
+      <div>
+        <div class="legend-label">측정</div>
+        <div class="legend-desc">학교·주변 환경을 직접 측정해 데이터를 모으는 탐구</div>
+      </div>
+    </div>
+    <div class="legend-card">
+      <span class="legend-icon">📊</span>
+      <div>
+        <div class="legend-label">데이터</div>
+        <div class="legend-desc">공공기관 공개 데이터를 분석하는 탐구</div>
+      </div>
+    </div>
+    <div class="legend-note">※ 각 팀은 실험·측정·데이터 중 1개 이상 포함 권장</div>
+  </div>
+</section>
+
+<!-- TOPICS -->
+<section class="topics">
+
+  <!-- ① 생물 -->
+  <div class="topic-block">
+    <div class="topic-header" onclick="toggleTopic(this)">
+      <span class="topic-num">TOPIC — 01 / 06</span>
+      <span class="topic-tag" style="background:rgba(52,211,153,.15);color:#34d399;">🧬 생물</span>
+      <h3 class="topic-title">기후변화와 생물</h3>
+    </div>
+    <p class="topic-desc">기후변화는 생물의 발아·생장·번식 시기와 서식지, 종 다양성을 바꾼다. 직접 식물을 키우고 학교 주변을 조사하며, 공공데이터와 비교해 기후변화가 생물에 미치는 영향을 탐구해보자.</p>
+    <div class="inquiry-grid">
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">01</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-exp">🧪 실험</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">온도 조건이 다르면 씨앗 발아 속도가 달라질까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">같은 씨앗(콩·무순)을 냉장(5°C) / 실온(20°C) / 따뜻한 곳(30°C) 세 조건에서 발아시키고 발아율과 발아 일수를 매일 기록.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">콩 또는 무순 씨앗, 화분 3개, 솜, 온도계, 냉장고, 따뜻한 공간</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">기후 온난화가 식물 생장 계절을 앞당기는 현상을 실험으로 재현. 대조군·실험군 설계 개념 학습.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">02</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-exp">🧪 실험</span><span class="diff-badge">★★☆ 보통</span></div>
+            <p class="card-question">물풀(엘로데아)의 광합성 속도는 온도에 따라 달라질까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">엘로데아를 차가운 물(10°C) / 실온(20°C) / 따뜻한 물(30°C)에 넣고 빛을 쪼여 1분간 발생하는 기포 수 측정.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">엘로데아(물풀), 비커 3개, 조명, 온도 조절 가능한 물, 초시계</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">온도와 광합성 속도의 관계를 정량적으로 측정. 기후변화가 탄소 순환에 미치는 영향으로 연결 가능.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">03</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-meas">📏 측정</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">우리 학교에서 장소(아스팔트·잔디·화단·나무 밑)에 따라 사는 생물이 다를까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">교내 4개 구역 설정 → 스마트폰 앱 '네이처링'으로 식물·곤충·새 종 목록 작성 → 구역별 종 수·종류 비교.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">스마트폰, 네이처링 앱, 돋보기, 기록지</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">서식 환경 다양성과 생물다양성의 관계를 직접 확인. 계절마다 반복하면 시간에 따른 변화도 관찰 가능.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">04</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-data">📊 데이터</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">우리나라 벚꽃 개화 시기는 최근 30년간 얼마나 앞당겨졌을까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">기상청 생물계절 관측 자료(서울 벚꽃 개화일) 30년치 → 연도별 그래프 → 같은 기간 3월 평균 기온과 비교.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">기상청 기상자료개방포털</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">개화일과 기온의 상관관계가 명확하게 나타남. '1°C 오르면 며칠 빨라지는가' 계산까지 가능.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ② 먹거리 -->
+  <div class="topic-block">
+    <div class="topic-header" onclick="toggleTopic(this)">
+      <span class="topic-num">TOPIC — 02 / 06</span>
+      <span class="topic-tag" style="background:rgba(163,230,53,.15);color:#a3e635;">🌾 먹거리</span>
+      <h3 class="topic-title">기후변화와 먹거리</h3>
+    </div>
+    <p class="topic-desc">기온이 오르면서 우리 밥상이 바뀌고 있다. 직접 식물을 키우며 가뭄·염류화 같은 기후 조건의 영향을 실험하고, 공공데이터로 우리나라 농업 지도의 변화를 추적해보자.</p>
+    <div class="inquiry-grid">
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">01</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-exp">🧪 실험</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">물 공급량이 다르면 식물 성장이 어떻게 달라질까? (모의 가뭄 실험)</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">같은 씨앗(강낭콩)을 심은 화분 3개에 물을 충분히·보통·거의 안 주는 세 조건으로 2주간 키우며 키·잎 색·잎 수를 매일 기록.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">강낭콩 씨앗, 화분 3개, 흙, 물, 자</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">가뭄이 식물 생장에 미치는 영향을 수치로 확인. 기후변화로 인한 가뭄 빈도 증가와 연결 가능.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">02</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-exp">🧪 실험</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">토양 염분 농도가 높으면 식물이 잘 자라지 못할까? (해수면 상승 토양 염류화 모델)</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">강낭콩 화분 4개에 소금 농도 다른 물(0% / 0.5% / 1% / 3%)로 2주간 키우며 발아율과 성장 키 기록.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">강낭콩, 화분 4개, 소금, 물, 전자저울, 자</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">해수면 상승으로 해안 농지가 염류화되는 문제를 직접 재현. 실험 결과가 명확히 나타남.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">03</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-data">📊 데이터</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">사과 주산지는 최근 30년간 얼마나 북쪽으로 이동했을까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">농촌진흥청 과수 재배 현황 데이터 → 시·도별 사과 재배 면적 1990년대 vs 2020년대 비교 → 지도에 시각화 → 기온 상승 데이터와 비교.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">농촌진흥청 농업통계, 기상청 기온 데이터, 지도</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">지도 시각화가 매우 인상적. '사과는 이제 경북이 아닌 강원도에서' 결과가 직관적으로 설득력 있음.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">04</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-data">📊 데이터</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">우리나라 아열대 작물 재배 면적은 기온 상승과 함께 늘어났을까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">농촌진흥청 아열대 작물(망고·바나나·파파야 등) 재배 현황 연도별 데이터 + 기상청 기온 데이터 → 비교 그래프 작성.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">농촌진흥청 농업통계, 기상청 기상자료개방포털</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">결과가 흥미롭고 학생들이 체감 가능한 소재. 재배 면적 변화가 기온 변화를 따라가는 패턴이 뚜렷함.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ 바다 -->
+  <div class="topic-block">
+    <div class="topic-header" onclick="toggleTopic(this)">
+      <span class="topic-num">TOPIC — 03 / 06</span>
+      <span class="topic-tag" style="background:rgba(59,130,246,.15);color:#3b82f6;">🌊 바다</span>
+      <h3 class="topic-title">기후변화와 바다</h3>
+    </div>
+    <p class="topic-desc">기후변화로 해수 온도가 오르고 바닷물이 산성으로 변하며 해수면이 높아지고 있다. 우리 손으로 직접 실험하고 데이터를 분석하여 바다에 무슨 일이 일어나고 있는지 밝혀보자.</p>
+    <div class="inquiry-grid">
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">01</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-exp">🧪 실험</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">이산화탄소가 많아지면 바닷물이 산성으로 변할까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">탄산음료(높은 CO₂) vs 생수(낮은 CO₂)에 달걀껍데기·조개껍데기를 넣고 무게 변화와 기포 발생을 시간별로 측정한다. BTB 용액으로 산성도 변화도 확인.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">탄산수, 생수, 달걀껍데기, 조개껍데기, 전자저울, BTB 용액, 비커</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">CO₂ 농도 차이가 탄산칼슘 용해 속도에 미치는 영향을 수치로 확인. 해양 산성화의 핵심 메커니즘을 직접 체험.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">02</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-exp">🧪 실험</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">육지 빙하가 녹을 때와 바다 빙하(해빙)가 녹을 때 해수면 변화는 다를까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">수조 두 개 준비 — ①빙하 얼음을 수조 밖 받침 위에 올린 경우 ②얼음을 수조 안 물 위에 띄운 경우 → 녹은 후 수위 변화 비교 측정.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">수조 2개, 얼음, 눈금자, 물</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">아르키메데스 원리를 체험하며 '왜 바다 빙하보다 육지 빙하가 더 위험한가'를 직접 데이터로 증명.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">03</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-data">📊 데이터</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">우리나라 해수면은 최근 30년간 얼마나 높아졌을까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">국립해양조사원 연안 해수면 관측 데이터(목포·제주·속초 등 3개 지점) 다운로드 → 연도별 평균 해수면 높이 그래프 → 상승 속도(mm/년) 계산.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">국립해양조사원 공공데이터, 모눈종이 or 엑셀</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">지점별 상승 속도 차이도 비교 가능. 실험 결과(빙하 녹기)와 연결하면 탐구 완성도 높아짐.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">04</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-data">📊 데이터</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">바닷물 온도는 계절마다 얼마나 다를까? 과거보다 높아졌을까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">국립해양조사원 해수 표층 수온 월별 데이터 → 같은 달 10년 단위 평균 비교 → 계절별 변화 그래프 작성.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">국립해양조사원 공공데이터</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">수온 상승이 해양 생태계에 미치는 영향(산호 백화 등)과 연결하면 스토리 완성.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ 건강 -->
+  <div class="topic-block">
+    <div class="topic-header" onclick="toggleTopic(this)">
+      <span class="topic-num">TOPIC — 04 / 06</span>
+      <span class="topic-tag" style="background:rgba(236,72,153,.15);color:#ec4899;">❤️ 건강</span>
+      <h3 class="topic-title">기후변화와 건강</h3>
+    </div>
+    <p class="topic-desc">기온이 오를수록 사람의 몸에도 직접적인 위협이 된다. 체감온도 실험과 온열질환 통계 분석을 통해 기후변화가 건강에 미치는 영향을 탐구해보자.</p>
+    <div class="inquiry-grid">
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">01</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-exp">🧪 실험</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">같은 온도라도 습도가 높으면 더 덥게 느껴질까? (체감온도 실험)</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">같은 공간에서 습도만 달리하여(가습기 사용) 체감 온도와 실제 온도를 기록. 습도별 체감온도 공식으로 계산값과 비교.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">온습도계, 가습기, 기록지</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">폭염의 위험이 단순히 기온만이 아님을 수치로 확인. 온열질환 데이터와 연결하면 탐구 완성도 높아짐.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">02</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-exp">🧪 실험</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">자외선 차단제 농도가 다르면 자외선 차단 효과도 다를까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">UV 감지 비드(자외선에 색 변하는 구슬)에 자외선 차단제를 농도별로(무도포·SPF15·SPF50) 바르고 햇빛에 노출 후 색 변화 관찰.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">UV 감지 비드, 자외선 차단제(여러 SPF), 햇빛 or 자외선 램프</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">기후변화로 자외선 노출이 증가하는 맥락과 연결. 실험 결과가 시각적으로 뚜렷해 흥미도 높음.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">03</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-data">📊 데이터</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">최근 10년간 폭염 일수와 온열질환자 수는 함께 증가했을까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">기상청 폭염 일수(연도별) + 질병관리청 온열질환 감시체계 통계 → 두 변수 꺾은선 그래프 비교 → 상관관계 분석.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">기상청 기상자료개방포털, 질병관리청 온열질환 통계</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">두 공공기관 데이터 연결이 핵심. 상관관계와 인과관계의 차이를 배우는 좋은 사례.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">04</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-data">📊 데이터</span><span class="diff-badge">★★☆ 보통</span></div>
+            <p class="card-question">폭염이 가장 심한 지역과 덜한 지역의 온열질환자 수는 차이가 날까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">기상청 지역별 폭염 일수 + 질병관리청 지역별 온열질환 통계 → 지역별 비교 막대그래프 → 인구 10만 명당 환자 수로 보정해 공정 비교.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">기상청 기상자료개방포털, 질병관리청 통계</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">'인구 보정' 개념을 스스로 도입하면 우수 탐구. 도농 격차, 냉방 인프라 차이와 연결 가능.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ 에너지 -->
+  <div class="topic-block">
+    <div class="topic-header" onclick="toggleTopic(this)">
+      <span class="topic-num">TOPIC — 05 / 06</span>
+      <span class="topic-tag" style="background:rgba(251,191,36,.15);color:#fbbf24;">⚡ 에너지</span>
+      <h3 class="topic-title">기후변화와 에너지</h3>
+    </div>
+    <p class="topic-desc">기후변화를 막으려면 에너지를 바꿔야 한다. 태양광·단열 실험을 통해 신재생에너지의 원리를 탐구하고, 실제 에너지 전환 데이터로 우리나라의 변화를 분석해보자.</p>
+    <div class="inquiry-grid">
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">01</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-exp">🧪 실험</span><span class="diff-badge">★★☆ 보통</span></div>
+            <p class="card-question">태양광 패널의 각도를 바꾸면 발전량이 달라질까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">소형 태양광 패널(5V)을 0°/30°/45°/60°/90°로 기울여 멀티미터로 전압·전류 측정 → 발전량(P=VI) 계산 → 최적 각도 탐구.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">소형 태양광 패널, 멀티미터, 각도기, 조명 or 햇빛</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">우리 지역 위도(약 37°)와 최적 각도 비교. 실제 태양광 설치 각도와 연결하면 생활 과학으로 확장.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">02</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-exp">🧪 실험</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">단열재 종류에 따라 온도 유지 능력이 다를까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">같은 크기 상자에 스티로폼·신문지·면·비닐 등 단열재를 각각 넣고 뜨거운 물(50°C)을 담은 컵을 올린 후 10분마다 온도 측정.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">상자 4개, 스티로폼, 신문지, 면, 비닐, 온도계, 뜨거운 물</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">단열 성능 차이를 수치로 비교. 건물 단열재와 에너지 절약의 연결로 탐구 확장 가능.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">03</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-exp">🧪 실험</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">검은 캔과 흰 캔, 태양열을 흡수하는 속도는 얼마나 차이 날까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">검은색으로 칠한 캔과 흰색 캔에 같은 양의 물을 넣고 햇빛(or 램프) 아래 놓은 후 5분마다 온도 측정.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">빈 캔 2개, 검은색·흰색 페인트 or 종이, 온도계, 물</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">태양열 에너지 흡수 원리를 직접 측정. 태양열 온수기·태양광 패널 색깔 설계와 연결 가능.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">04</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-data">📊 데이터</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">우리나라 신재생에너지 비율은 최근 10년간 얼마나 변했을까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">에너지경제연구원 에너지 믹스 데이터 → 전원별(석탄·가스·태양광·풍력·원자력) 비율 연도별 변화 그래프 → 다른 나라와 비교.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">에너지경제연구원 통계, IEA 데이터</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">한국의 에너지 전환 속도를 독일·덴마크 등과 비교하면 정책 토론으로 연결 가능.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ 재난 -->
+  <div class="topic-block">
+    <div class="topic-header" onclick="toggleTopic(this)">
+      <span class="topic-num">TOPIC — 06 / 06</span>
+      <span class="topic-tag" style="background:rgba(248,113,113,.15);color:#f87171;">🌪️ 재난</span>
+      <h3 class="topic-title">기후변화와 재난</h3>
+    </div>
+    <p class="topic-desc">기후변화는 집중호우·홍수·산사태·폭염 같은 재난을 더 자주, 더 강하게 만든다. 직접 모형 실험으로 재난의 원리를 재현하고, 공공데이터로 우리나라 재난의 변화를 추적해보자.</p>
+    <div class="inquiry-grid">
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">01</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-exp">🧪 실험</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">표면 종류(잔디·흙·아스팔트·자갈)에 따라 물이 스며드는 속도가 다를까? (도시 홍수 모델)</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">화분 4개에 각각 잔디·흙·아스팔트 모형(타일)·자갈을 넣고 같은 양의 물을 부어 밑으로 빠져나오는 시간과 양 측정. 안 빠진 물(=지표에 고이는 물)도 비교.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">화분 4개, 잔디·흙·자갈·타일, 물, 비커, 초시계</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">도시화로 불투수면이 늘면서 도시 홍수 위험이 높아지는 이유를 직접 확인. 그린 인프라의 필요성으로 연결 가능.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">02</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-exp">🧪 실험</span><span class="diff-badge">★★☆ 보통</span></div>
+            <p class="card-question">경사면에 식물이 있으면 토사 유출(산사태)을 얼마나 막아줄까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">쟁반에 같은 경사로 흙을 쌓아 ①맨흙 ②잔디·콩나물 뿌리가 자란 흙 두 모형을 만들고, 같은 양의 물을 같은 높이에서 부어 흘러내린 흙(토사) 무게를 비교 측정.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">쟁반 2개, 흙, 잔디 or 콩나물, 물뿌리개, 받침대, 전자저울</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">집중호우 시 산사태·토양 침식의 원리를 모형으로 재현. 식생 복원이 재난을 줄이는 자연 기반 해법임을 체험.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">03</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-data">📊 데이터</span><span class="diff-badge">★☆☆ 쉬움</span></div>
+            <p class="card-question">우리 지역 집중호우(시간당 30mm 이상) 빈도는 최근 30년간 늘어났을까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">기상청 기상자료개방포털 → 우리 지역 측정소 시간당 강수량 30년치 → 10년 단위로 집중호우 발생 횟수 비교 → 총 강수량 변화와도 비교.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">기상청 기상자료개방포털</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">총 강수량보다 집중호우 빈도 변화가 더 극적인 경우가 많음. '양은 비슷한데 왜 홍수가 자주 날까?'로 심화 탐구 연결.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inquiry-card" onclick="toggleCard(this)">
+        <div class="card-header">
+          <span class="card-num">04</span>
+          <div class="card-body">
+            <div class="card-type-row"><span class="type-badge type-data">📊 데이터</span><span class="diff-badge">★★☆ 보통</span></div>
+            <p class="card-question">우리나라 자연재난(호우·태풍·폭염) 피해는 최근 어떻게 변하고 있을까?</p>
+          </div>
+          <span class="card-toggle">+</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-row">
+            <div class="detail-box full">
+              <div class="detail-label">탐구 방법</div>
+              <div class="detail-text">행정안전부 재해연보(국가재난정보) → 연도별 자연재난 유형별 피해액·피해 건수 → 호우·태풍·폭염 추이 그래프 작성 → 기온·강수 데이터와 비교.</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">준비물</div>
+              <div class="detail-text">행정안전부 재해연보, 기상청 기상자료개방포털</div>
+            </div>
+            <div class="point-box">
+              <div class="detail-label">✦ 핵심 포인트</div>
+              <div class="detail-text">재난 피해를 '돈'과 '횟수'로 체감. 물가 상승 효과를 함께 고려하면 비판적 데이터 해석 훈련 가능.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- FOOTER NOTES -->
+<div class="footer-notes">
+  <p class="note">실험 재료는 학교 과학실 기본 비품으로 대부분 해결 가능합니다.</p>
+</div>
+
+<!-- SITE FOOTER -->
+<footer class="site-footer">
+  SCIENCE THINK TANK · CLIMATE CHANGE INQUIRY
+</footer>
+
+<script>
+function toggleCard(el) {
+  el.classList.toggle('open');
+}
+function toggleTopic(headerEl) {
+  headerEl.closest('.topic-block').classList.toggle('open');
+}
+</script>
+</body>
+</html>
