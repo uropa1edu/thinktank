@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>지구를 구하는 과학 싱크탱크 — 배경학습 제시문</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800Syne:wght@700;800&family=Noto+Serif+KR:wght@300;400;600&family=Space+Mono:wght@400;700family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #020810;
+    --bg2: #050f1e;
+    --panel: rgba(6,20,45,0.85);
+    --border: rgba(0,200,150,0.25);
+    --green: #00e8a0;
+    --green2: #00c87a;
+    --cyan: #00d4ff;
+    --gold: #f0c040;
+    --red: #ff4466;
+    --text: #c8e8d8;
+    --muted: #5a8070;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── 별 배경 ── */
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(0,200,150,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,180,255,0.06) 0%, transparent 60%);
+    pointer-events:none; z-index:0;
+  }
+
+  canvas#stars {
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+  }
+
+  /* ── 헤더 ── */
+  header {
+    position:relative; z-index:10;
+    text-align:center;
+    padding: 60px 20px 40px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-badge {
+    display:inline-block;
+    font-family:'Syne', sans-serif;
+    font-size:11px;
+    color: var(--green);
+    letter-spacing:3px;
+    border: 1px solid var(--green);
+    padding: 4px 16px;
+    margin-bottom:20px;
+    text-transform:uppercase;
+    animation: pulse-border 2s infinite;
+  }
+
+  @keyframes pulse-border {
+    0%,100% { border-color: rgba(0,232,160,0.6); }
+    50% { border-color: rgba(0,232,160,1); }
+  }
+
+  header h1 {
+    font-family:'Syne', sans-serif;
+    font-size: clamp(18px, 4vw, 36px);
+    font-weight:800;
+    color:#fff;
+    letter-spacing:2px;
+    line-height:1.3;
+    text-shadow: 0 0 40px rgba(0,232,160,0.4);
+  }
+
+  header h1 span { color: var(--green); }
+
+  .header-sub {
+    margin-top:12px;
+    font-size:13px;
+    color: var(--muted);
+    letter-spacing:1px;
+    font-family:'Syne', sans-serif;
+  }
+
+  /* ── 경고 배너 ── */
+  .alert-banner {
+    position:relative; z-index:10;
+    margin: 24px auto;
+    max-width:860px;
+    padding: 16px 28px;
+    background: rgba(255,40,70,0.08);
+    border: 1px solid rgba(255,40,70,0.35);
+    border-left: 4px solid var(--red);
+    font-family:'Syne', sans-serif;
+    font-size:12px;
+    color: #ffaabb;
+    letter-spacing:0.5px;
+    display:flex; align-items:center; gap:12px;
+  }
+  .alert-banner::before {
+    content:'⚠ CRITICAL';
+    color: var(--red);
+    font-weight:700;
+    white-space:nowrap;
+  }
+
+  /* ── 주제 그리드 ── */
+  .topic-grid {
+    position:relative; z-index:10;
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap:16px;
+    max-width:1100px;
+    margin: 32px auto;
+    padding: 0 24px;
+  }
+
+  .topic-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 24px 28px;
+    cursor:pointer;
+    transition: all 0.3s ease;
+    position:relative;
+    overflow:hidden;
+    backdrop-filter: blur(12px);
+  }
+
+  .topic-card::before {
+    content:'';
+    position:absolute; inset:0;
+    background: linear-gradient(135deg, rgba(0,232,160,0.06) 0%, transparent 60%);
+    opacity:0; transition: opacity 0.3s;
+  }
+
+  .topic-card:hover {
+    border-color: var(--green);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 40px rgba(0,232,160,0.15);
+  }
+  .topic-card:hover::before { opacity:1; }
+
+  .topic-card.active {
+    border-color: var(--green);
+    box-shadow: 0 0 30px rgba(0,232,160,0.2), inset 0 0 30px rgba(0,232,160,0.03);
+  }
+
+  .card-id {
+    font-family:'Syne', sans-serif;
+    font-size:11px;
+    color: var(--muted);
+    letter-spacing:2px;
+    margin-bottom:10px;
+  }
+
+  .card-icon {
+    font-size:28px;
+    margin-bottom:12px;
+    display:block;
+  }
+
+  .card-title {
+    font-family:'Syne', sans-serif;
+    font-size:13px;
+    font-weight:700;
+    color:#fff;
+    letter-spacing:1px;
+    margin-bottom:8px;
+  }
+
+  .card-hook {
+    font-size:12px;
+    color: var(--muted);
+    line-height:1.6;
+  }
+
+  .card-arrow {
+    position:absolute; right:20px; bottom:20px;
+    font-family:'Syne', sans-serif;
+    font-size:11px;
+    color: var(--green);
+    opacity:0; transition: opacity 0.2s;
+  }
+  .topic-card:hover .card-arrow { opacity:1; }
+
+  /* ── 제시문 패널 ── */
+  .doc-panel {
+    display:none;
+    position:relative; z-index:10;
+    max-width:900px;
+    margin: 0 auto 60px;
+    padding: 0 24px;
+    animation: fadeSlide 0.4s ease;
+  }
+
+  .doc-panel.active { display:block; }
+
+  @keyframes fadeSlide {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .doc-inner {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(16px);
+    padding: 48px 52px;
+    position:relative;
+  }
+
+  /* 코너 데코 */
+  .doc-inner::before, .doc-inner::after {
+    content:'';
+    position:absolute;
+    width:20px; height:20px;
+    border-color: var(--green);
+    border-style:solid;
+  }
+  .doc-inner::before { top:-1px; left:-1px; border-width:2px 0 0 2px; }
+  .doc-inner::after  { bottom:-1px; right:-1px; border-width:0 2px 2px 0; }
+
+  .doc-header {
+    display:flex; justify-content:space-between; align-items:flex-start;
+    margin-bottom:36px;
+    padding-bottom:24px;
+    border-bottom: 1px solid var(--border);
+    gap:20px; flex-wrap:wrap;
+  }
+
+  .doc-title-group {}
+
+  .doc-code {
+    font-family:'Syne', sans-serif;
+    font-size:11px;
+    color: var(--muted);
+    letter-spacing:2px;
+    margin-bottom:10px;
+  }
+
+  .doc-title {
+    font-family:'Syne', sans-serif;
+    font-size:clamp(16px, 3vw, 24px);
+    font-weight:800;
+    color:#fff;
+    letter-spacing:1px;
+    text-shadow: 0 0 20px rgba(0,232,160,0.3);
+  }
+
+  .doc-title span { color: var(--green); }
+
+  .video-btn {
+    display:inline-flex; align-items:center; gap:10px;
+    padding: 12px 22px;
+    background: rgba(0,232,160,0.08);
+    border: 1px solid var(--green);
+    color: var(--green);
+    text-decoration:none;
+    font-family:'Syne', sans-serif;
+    font-size:12px;
+    letter-spacing:1px;
+    transition: all 0.25s;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+  .video-btn:hover {
+    background: rgba(0,232,160,0.18);
+    box-shadow: 0 0 20px rgba(0,232,160,0.25);
+  }
+  .video-btn::before { content:'▶'; font-size:10px; }
+
+  /* 본문 */
+  .doc-lead {
+    font-size:15px;
+    line-height:2.2;
+    color: #aacfbf;
+    margin-bottom:36px;
+    padding: 20px 24px;
+    background: rgba(0,232,160,0.04);
+    border-left: 3px solid var(--green);
+    letter-spacing: 0.01em;
+  }
+
+  .doc-section {
+    margin-bottom:32px;
+  }
+
+  .doc-section h3 {
+    font-family:'Syne', sans-serif;
+    font-size:13px;
+    font-weight:700;
+    color: var(--green);
+    letter-spacing:2px;
+    margin-bottom:14px;
+    display:flex; align-items:center; gap:10px;
+  }
+
+  .doc-section h3::after {
+    content:'';
+    flex:1;
+    height:1px;
+    background: linear-gradient(to right, var(--border), transparent);
+  }
+
+  .doc-section p {
+    font-size:14.5px;
+    line-height:2.2;
+    color: #b8d8c8;
+    word-break:keep-all;
+    letter-spacing: 0.01em;
+  }
+
+  .doc-section p + p { margin-top:12px; }
+
+  .highlight {
+    color: var(--gold);
+    font-weight:500;
+  }
+
+  .danger {
+    color: #ff8899;
+    font-weight:500;
+  }
+
+  .stat-box {
+    display:inline-block;
+    background: rgba(0,232,160,0.08);
+    border: 1px solid rgba(0,232,160,0.2);
+    padding: 2px 10px;
+    font-family:'Syne', sans-serif;
+    font-size:13px;
+    color: var(--green);
+    margin: 0 2px;
+  }
+
+  .close-btn {
+    display:block;
+    margin: 28px auto 0;
+    padding: 10px 32px;
+    background: transparent;
+    border: 1px solid var(--muted);
+    color: var(--muted);
+    font-family:'Syne', sans-serif;
+    font-size:12px;
+    letter-spacing:2px;
+    cursor:pointer;
+    transition: all 0.2s;
+  }
+  .close-btn:hover {
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  /* ── 하단 ── */
+  footer {
+    position:relative; z-index:10;
+    text-align:center;
+    padding: 32px;
+    border-top: 1px solid var(--border);
+    font-family:'Syne', sans-serif;
+    font-size:11px;
+    color: var(--muted);
+    letter-spacing:1px;
+  }
+
+  /* 스크롤바 */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: rgba(0,232,160,0.3); border-radius:3px; }
+
+  @media (max-width:600px) {
+    .doc-inner { padding: 28px 20px; }
+    .doc-header { flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<header>
+  <div class="header-badge">GOCHON MIDDLE SCHOOL · THINK TANK · 2026</div>
+  <h1>🌍 지구를 구하는 <span>과학 싱크탱크</span></h1>
+  <p class="header-sub">// BACKGROUND BRIEFING DOCUMENTS · 배경학습 제시문</p>
+</header>
+
+<div style="position:relative;z-index:10;max-width:860px;margin:0 auto;padding:0 24px;">
+  <div class="alert-banner">
+    지금 이 순간에도 지구의 온도는 오르고 있습니다. 오늘 배울 내용은 먼 미래의 이야기가 아닌, 여러분이 살아갈 세상의 이야기입니다.
+  </div>
+</div>
+
+<!-- 주제 카드 그리드 -->
+<div class="topic-grid" id="topicGrid">
+
+  <div class="topic-card" onclick="openDoc('ocean')">
+    <div class="card-id">TOPIC — 01 / 06</div>
+    <span class="card-icon">🌊</span>
+    <div class="card-title">기후변화와 바다</div>
+    <div class="card-hook">해수면이 오르고, 산호초가 죽어가고, 우리가 아는 바다가 사라지고 있습니다.</div>
+    <div class="card-arrow">OPEN ▶</div>
+  </div>
+
+  <div class="topic-card" onclick="openDoc('bio')">
+    <div class="card-id">TOPIC — 02 / 06</div>
+    <span class="card-icon">🌿</span>
+    <div class="card-title">기후변화와 생물</div>
+    <div class="card-hook">꿀벌이 사라지고 있습니다. 봄이 달라지면 먹이사슬 전체가 무너집니다.</div>
+    <div class="card-arrow">OPEN ▶</div>
+  </div>
+
+  <div class="topic-card" onclick="openDoc('energy')">
+    <div class="card-id">TOPIC — 03 / 06</div>
+    <span class="card-icon">⚡</span>
+    <div class="card-title">기후변화와 에너지</div>
+    <div class="card-hook">화석연료를 태울 때마다 미래가 뜨거워집니다. 에너지를 바꾸는 것이 해답입니다.</div>
+    <div class="card-arrow">OPEN ▶</div>
+  </div>
+
+  <div class="topic-card" onclick="openDoc('disaster')">
+    <div class="card-id">TOPIC — 04 / 06</div>
+    <span class="card-icon">⛈️</span>
+    <div class="card-title">기후변화와 재난</div>
+    <div class="card-hook">홍수, 폭염, 산불. 재난이 일상이 된 세계가 이미 시작됐습니다.</div>
+    <div class="card-arrow">OPEN ▶</div>
+  </div>
+
+  <div class="topic-card" onclick="openDoc('health')">
+    <div class="card-id">TOPIC — 05 / 06</div>
+    <span class="card-icon">❤️</span>
+    <div class="card-title">기후변화와 건강</div>
+    <div class="card-hook">더워진 지구는 새로운 전염병을 만들고, 우리 몸을 직접 위협합니다.</div>
+    <div class="card-arrow">OPEN ▶</div>
+  </div>
+
+  <div class="topic-card" onclick="openDoc('food')">
+    <div class="card-id">TOPIC — 06 / 06</div>
+    <span class="card-icon">🌾</span>
+    <div class="card-title">기후변화와 먹거리</div>
+    <div class="card-hook">강원도에서 사과가 사라질 수 있습니다. 우리 밥상이 바뀌고 있습니다.</div>
+    <div class="card-arrow">OPEN ▶</div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════ 제시문 패널들 ═══════════════════════════ -->
+
+<!-- 01 바다 -->
+<div class="doc-panel" id="doc-ocean">
+  <div class="doc-inner">
+    <div class="doc-header">
+      <div class="doc-title-group">
+        <div class="doc-code">BRIEFING DOC · 01 / 06 · OCEAN SYSTEMS</div>
+        <div class="doc-title">기후변화와 <span>바다</span></div>
+      </div>
+      <a class="video-btn" href="https://youtu.be/s5bkGvJLMu8" target="_blank">영상으로 보기</a>
+    </div>
+
+    <div class="doc-lead">
+      지구가 더워지면 가장 먼저 영향을 받는 곳은 바다입니다. 바다는 지구 표면의 <span class="highlight">70% 이상</span>을 덮고 있으며, 지구에서 발생하는 열의 <span class="highlight">약 93%</span>를 흡수합니다. 우리가 느끼는 더위보다 훨씬 더 많은 열이 지금 이 순간 바다 속으로 쌓이고 있습니다. 그 결과 바닷물의 온도가 점점 올라가면서, 우리가 아는 바다의 모습이 빠르게 바뀌고 있습니다.
+    </div>
+
+    <div class="doc-section">
+      <h3>🌡️ 바닷물 온도가 오르고 있다</h3>
+      <p>지난 100년간 지구 평균 해수면 온도는 약 <span class="stat-box">0.9℃</span> 상승했습니다. 숫자만 보면 작아 보이지만, 이것은 엄청난 변화입니다. 바다 전체의 온도가 1℃ 오르려면 지구 전체 인류가 사용하는 에너지의 수백 배에 해당하는 열에너지가 필요합니다. 해수 온도 상승은 태풍을 더 강하게 만들고, 수천 년 동안 이어진 해류의 흐름을 바꾸며, 물고기들의 서식지를 변화시킵니다. 우리나라 동해에서 명태가 사라진 것도 이와 무관하지 않습니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🪸 산호초가 하얗게 변하는 이유</h3>
+      <p>산호초는 <span class="highlight">'바다의 열대우림'</span>이라고 불립니다. 전체 해양 생물의 약 25%가 산호초 주변에서 살아가기 때문입니다. 산호는 '조류(藻類)'라는 아주 작은 식물과 함께 살면서, 그 조류가 광합성으로 만들어내는 영양분을 먹고 삽니다. 이 둘은 서로 없어서는 안 되는 관계입니다.</p>
+      <p>그런데 바닷물 온도가 조금만 올라가도 산호는 극심한 스트레스를 받아 조류를 내쫓아 버립니다. 조류를 잃은 산호는 아름다운 색을 잃고 하얗게 변합니다. 이것을 <span class="highlight">'산호 백화 현상'</span>이라고 합니다. 조류가 없어진 산호는 먹이를 잃고 천천히 굶어 죽습니다. 산호가 죽으면 그 주변에 살던 수천 종의 물고기와 생물들도 보금자리를 잃습니다. 현재 전 세계 산호초의 약 <span class="danger">50%가 이미 사라졌습니다.</span></p>
+    </div>
+
+    <div class="doc-section">
+      <h3>⚗️ 바다가 점점 산성이 되고 있다</h3>
+      <p>우리가 공장을 돌리고 자동차를 타고 석탄을 태울 때마다 이산화탄소(CO₂)가 대기 중으로 올라갑니다. 그 이산화탄소의 약 30%는 바다가 흡수합니다. 이산화탄소가 바닷물에 녹으면 탄산(H₂CO₃)이 만들어지고, 바닷물은 점점 산성으로 변합니다. 산업화 이전과 비교했을 때 바닷물의 pH는 이미 <span class="stat-box">0.1</span> 낮아졌습니다. 이것은 산성도가 <span class="danger">약 26% 증가</span>한 것입니다.</p>
+      <p>산성화된 바닷물은 조개, 게, 산호처럼 탄산칼슘으로 껍데기를 만드는 생물들에게 치명적입니다. 산성 바닷물 속에서는 껍데기 재료가 녹아버리기 때문에 껍데기가 얇아지거나 아예 만들어지지 않습니다. 우리가 즐겨 먹는 굴, 홍합, 게 같은 해산물들이 점점 구하기 어려워질 수 있습니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🌊 해수면도 높아지고 있다</h3>
+      <p>바닷물 온도가 오르면 물 분자 사이의 간격이 벌어지면서 부피가 팽창합니다. 여기에 육지의 빙하와 남극·북극의 얼음이 녹아 바다로 흘러들면서 해수면은 더욱 빠르게 높아지고 있습니다. 지난 100년간 전 세계 평균 해수면은 약 <span class="stat-box">20cm</span> 상승했습니다. 현재 속도라면 2100년까지 최대 <span class="danger">1m 이상</span> 높아질 수 있다고 과학자들은 경고합니다.</p>
+      <p>남극 대륙에는 '운명의 날 빙하(Thwaites Glacier)'라고 불리는 거대한 빙하가 있습니다. 이 빙하가 모두 녹으면 전 세계 해수면이 약 3m 이상 상승할 수 있습니다. 지금도 따뜻한 바닷물이 이 빙하 아래를 조금씩 녹이고 있습니다. 태평양의 작은 섬나라들은 이미 가라앉고 있으며, 부산, 인천 같은 우리나라 해안 도시도 침수 위험에서 자유롭지 않습니다.</p>
+    </div>
+
+    <button class="close-btn" onclick="closeDoc('ocean')">▲ 닫기</button>
+  </div>
+</div>
+
+<!-- 02 생물 -->
+<div class="doc-panel" id="doc-bio">
+  <div class="doc-inner">
+    <div class="doc-header">
+      <div class="doc-title-group">
+        <div class="doc-code">BRIEFING DOC · 02 / 06 · BIODIVERSITY</div>
+        <div class="doc-title">기후변화와 <span>생물</span></div>
+      </div>
+      <a class="video-btn" href="https://youtu.be/Rc1fJR4rsoo" target="_blank">영상으로 보기</a>
+    </div>
+
+    <div class="doc-lead">
+      기후변화는 단순히 기온이 오르는 문제가 아닙니다. 그것은 지구에 살고 있는 모든 생물들의 삶을 바꿉니다. 수백만 년에 걸쳐 서로 맞춰온 생물들의 리듬이 어긋나고, 서식지가 사라지고, 먹이사슬이 끊어지고 있습니다. 지금 지구에서는 하루에 약 <span class="danger">150종의 생물</span>이 영원히 사라지고 있습니다.
+    </div>
+
+    <div class="doc-section">
+      <h3>🐝 꿀벌과 구상나무가 사라지고 있다</h3>
+      <p>지금 우리나라에서 꿀벌이 급격히 줄고 있습니다. 꿀벌은 단순히 꿀을 만드는 곤충이 아닙니다. 전 세계 식량 작물의 약 <span class="highlight">70%</span>는 꿀벌이 꽃가루를 옮겨줘야만 열매를 맺습니다. 꿀벌이 없으면 딸기, 사과, 아몬드, 토마토가 열리지 않습니다. 기후변화로 꽃 피는 시기와 꿀벌 활동 시기가 어긋나면서 꿀벌이 먹이를 찾지 못해 죽어가고 있습니다.</p>
+      <p>한라산 구상나무도 마찬가지입니다. 구상나무는 우리나라 고산지대에서만 자라는 고유종인데, 겨울이 따뜻해지고 눈이 줄어들면서 서식지가 빠르게 사라지고 있습니다. 전문가들은 현재 추세라면 이번 세기 안에 한국의 구상나무가 <span class="danger">멸종할 수 있다</span>고 경고합니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🌸 봄이 빨라지면서 생기는 문제</h3>
+      <p>기온이 올라가면 봄이 일찍 찾아옵니다. 그런데 이것이 큰 문제가 됩니다. 철새들은 수천 킬로미터를 날아오는 시기를 본능적으로 맞춰왔지만, 그 과정에서 먹이로 삼는 곤충들이 이미 더 일찍 등장해서 사라진 뒤일 수 있습니다. 꽃이 더 일찍 피었는데 꿀벌이 아직 겨울잠에서 깨어나지 않으면 수분이 이루어지지 않습니다. 이처럼 서로 의존하는 종들의 생활 주기가 어긋나는 현상을 <span class="highlight">'생태계 불일치'</span>라고 합니다.</p>
+      <p>우리나라의 벚꽃 개화일은 30년 전보다 평균 <span class="stat-box">약 7일</span> 빨라졌습니다. 이 작은 변화가 곤충, 새, 식물 사이의 관계를 조금씩 무너뜨리고 있습니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🗺️ 서식지가 사라지고 있다</h3>
+      <p>기후변화로 인해 많은 동식물들이 살기 적합한 환경을 찾아 이동하고 있습니다. 산에 사는 동물들은 더 높은 곳으로 올라가고, 극지방의 생물들은 더 추운 곳을 찾아 이동합니다. 우리나라 고유종인 한국 꼬리치레도롱뇽은 서식지의 <span class="danger">90%가 2070년쯤 파괴될 것</span>으로 예측됩니다.</p>
+      <p>과학자들은 현재의 멸종 속도가 자연적인 수준보다 <span class="highlight">1,000배 이상 빠르다</span>고 경고합니다. 이동 속도가 기후변화 속도를 따라가지 못하는 종들은 그냥 사라집니다. 한번 사라진 생물은 어떤 기술로도 되살릴 수 없습니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🐟 바다 생물도 바뀐다</h3>
+      <p>수온이 오르면서 우리나라 주변 바다의 어종도 달라지고 있습니다. 한때 동해의 대표 생선이었던 명태가 거의 사라지고, 대신 아열대성 물고기인 참다랑어, 방어, 복어 같은 어종이 크게 늘었습니다. 예전에는 제주도 근해에서나 볼 수 있던 물고기들이 이제 강원도 해안에서도 잡힙니다. 먹는 것부터 달라지고 있는 것입니다.</p>
+    </div>
+
+    <button class="close-btn" onclick="closeDoc('bio')">▲ 닫기</button>
+  </div>
+</div>
+
+<!-- 03 에너지 -->
+<div class="doc-panel" id="doc-energy">
+  <div class="doc-inner">
+    <div class="doc-header">
+      <div class="doc-title-group">
+        <div class="doc-code">BRIEFING DOC · 03 / 06 · ENERGY TRANSITION</div>
+        <div class="doc-title">기후변화와 <span>에너지</span></div>
+      </div>
+      <a class="video-btn" href="https://youtu.be/ksSjApnjBzs" target="_blank">영상으로 보기</a>
+    </div>
+
+    <div class="doc-lead">
+      기후변화의 가장 큰 원인은 무엇일까요? 바로 화석연료(석탄, 석유, 천연가스)를 태울 때 나오는 이산화탄소입니다. 우리가 전기를 켜고, 자동차를 타고, 물건을 살 때마다 이산화탄소가 쌓입니다. 기후변화를 막으려면 에너지를 만드는 방식 자체를 바꿔야 합니다. 이것이 <span class="highlight">'에너지 전환'</span>입니다.
+    </div>
+
+    <div class="doc-section">
+      <h3>☀️ 태양광 에너지</h3>
+      <p>태양광 발전은 태양 전지(Solar cell)를 이용하여 태양 빛을 직접 전기로 바꿉니다. 태양이 지구에 1시간 동안 보내는 에너지는 전 인류가 1년 동안 사용하는 에너지보다 많습니다. 우리는 그 엄청난 에너지를 거의 쓰지 못하고 있었습니다.</p>
+      <p>태양광 발전 비용은 지난 10년간 약 <span class="stat-box">90%</span> 낮아졌습니다. 이제 많은 나라에서 석탄 발전보다 태양광 발전이 더 저렴해졌습니다. 우리나라 경북 청송, 경남 합천댐 등 전국 각지에 수상 태양광 발전소가 들어서고 있습니다. 학교 옥상이나 고속도로 방음벽에도 태양광 패널이 설치되고 있습니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>💨 풍력 에너지</h3>
+      <p>풍력 발전은 바람의 힘으로 거대한 날개(블레이드)를 돌려 전기를 만듭니다. 우리나라 제주 한경면에는 국내 최초 해상풍력 발전 단지가 있으며, 연간 <span class="highlight">25,000가구</span>에 전력을 공급하고 이산화탄소를 37,000톤 줄입니다. 전남 고창·부안에는 국내 최대 규모의 해상풍력 단지가 건설 중입니다. 강원도 태백과 정선의 육상 풍력 단지는 지역 주민을 고용하며 지역 경제에도 기여합니다.</p>
+      <p>풍력 발전기 한 대가 1년 동안 만드는 전기는 <span class="stat-box">400~500가구</span>가 사용할 수 있는 양입니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🔋 에너지 저장과 그린 수소</h3>
+      <p>태양광과 풍력의 약점이 있습니다. 해가 없으면 발전이 안 되고, 바람이 없으면 발전이 안 됩니다. 이 문제를 해결하기 위해 배터리(ESS) 기술이 빠르게 발전하고 있습니다. 낮에 남는 태양광 전기를 배터리에 저장했다가 밤에 쓰는 방식입니다.</p>
+      <p>더 나아가 <span class="highlight">'그린 수소'</span>라는 기술도 있습니다. 제주도의 한 발전 단지에서는 풍력 발전으로 물을 전기분해해서 하루 35kg의 수소를 만들고 있습니다. 이 수소는 수소차 7대를 충전할 수 있으며, 만드는 과정에서 이산화탄소가 전혀 나오지 않습니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🇰🇷 우리나라의 에너지 전환</h3>
+      <p>우리나라는 아직 전체 전기 생산의 약 <span class="danger">30%를 석탄</span>에서 얻고 있습니다. 우리나라 1인당 탄소 배출량은 세계 평균의 2.5배에 달합니다. 정부는 2050년까지 탄소중립을 달성하겠다고 선언했지만, 할 일이 아직 많습니다. 에너지 전환은 정부와 기업만의 문제가 아닙니다. 우리가 어떤 에너지를 쓰고, 어떤 제품을 사고, 어떤 선택을 하느냐가 미래를 바꿉니다.</p>
+    </div>
+
+    <button class="close-btn" onclick="closeDoc('energy')">▲ 닫기</button>
+  </div>
+</div>
+
+<!-- 04 재난 -->
+<div class="doc-panel" id="doc-disaster">
+  <div class="doc-inner">
+    <div class="doc-header">
+      <div class="doc-title-group">
+        <div class="doc-code">BRIEFING DOC · 04 / 06 · CLIMATE DISASTER</div>
+        <div class="doc-title">기후변화와 <span>재난</span></div>
+      </div>
+      <a class="video-btn" href="https://youtu.be/B5Roq0Ydcf0" target="_blank">영상으로 보기</a>
+    </div>
+
+    <div class="doc-lead">
+      2025년, 전 세계는 연초의 대형 산불을 시작으로 폭염, 태풍, 홍수가 끊이지 않는 한 해를 보냈습니다. 이것이 특별한 사건이 아닙니다. 이런 해가 앞으로 <span class="danger">매년</span> 반복될 것입니다. 기후 재난은 더 이상 '가끔 일어나는 자연재해'가 아니라 <span class="highlight">우리 삶의 배경</span>이 되고 있습니다.
+    </div>
+
+    <div class="doc-section">
+      <h3>🌧️ 폭우와 홍수가 늘어나는 이유</h3>
+      <p>기온이 오르면 바다와 땅의 수분이 더 빠르게 증발해 대기 중에 수증기가 쌓입니다. 기온이 <span class="stat-box">1℃</span> 오를 때마다 대기가 담을 수 있는 수증기량은 약 7% 증가합니다. 이것은 비가 올 때 한꺼번에 더 많은 비가 쏟아진다는 것을 의미합니다.</p>
+      <p>비가 천천히 내리면 땅이 흡수할 수 있습니다. 하지만 짧은 시간에 집중적으로 내리면 아스팔트와 콘크리트로 덮인 도시의 하수도가 감당하지 못하고 홍수가 납니다. 2022년 서울 강남 지역이 폭우로 침수된 것, 2023년 충북 오송 지하차도 참사도 이러한 집중 강우가 원인이었습니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🔥 산불이 더 커지고 잦아지는 이유</h3>
+      <p>기후변화로 기온이 오르고 건조한 날이 늘면서 산불이 더 자주, 더 크게 발생하고 있습니다. 2023년 캐나다에서 발생한 산불은 역사상 최대 규모였으며, 그 연기가 대서양을 건너 유럽의 하늘을 뒤덮었습니다. 산불 연기는 초미세먼지를 포함한 엄청난 양의 오염물질을 내뿜어 수천 킬로미터 밖 사람들의 건강까지 위협합니다.</p>
+      <p>더 무서운 점은 재난이 <span class="highlight">서로를 증폭</span>시킨다는 것입니다. 가뭄이 땅을 말리고, 말라붙은 땅에 집중 강우가 내리면 땅이 물을 흡수하지 못해 돌발 홍수가 됩니다. 한 재난이 다음 재난을 키우는 악순환이 시작된 것입니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🌡️ 폭염이 더 길어지고 있다</h3>
+      <p>지구 평균 기온은 산업혁명 이후 이미 <span class="stat-box">1.2℃</span> 올랐습니다. 이 에너지 변화가 얼마나 큰지 감이 잘 오지 않는다면 이렇게 생각해보세요. 매초 원자폭탄 4개가 터지는 것과 맞먹는 에너지가 지구에 쌓이고 있는 것입니다.</p>
+      <p>우리나라도 변화를 느낄 수 있습니다. 서울의 열대야 일수가 9일, 제주는 17일에 달한 해도 있었습니다. 과학자들은 <span class="danger">올해가 앞으로 우리 삶에서 가장 시원한 해로 기억될 수 있다</span>고 경고합니다. 지금보다 더 시원한 여름은 더 이상 오지 않을 수 있다는 뜻입니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🇰🇷 우리나라의 기상 이변</h3>
+      <p>우리나라 연평균 기온은 지난 100년간 약 <span class="stat-box">1.8℃</span> 올랐습니다. 이는 전 세계 평균보다 높은 수치입니다. 포장된 도시 지면은 빗물을 흡수하지 못해 홍수 피해를 키웁니다. 기상청 통계에 따르면 1980년대와 비교해 현재 우리나라의 여름은 약 20일 더 길어졌고, 겨울은 약 22일 짧아졌습니다. 이것은 통계 속 숫자가 아니라 여러분 세대가 살아갈 환경의 변화입니다.</p>
+    </div>
+
+    <button class="close-btn" onclick="closeDoc('disaster')">▲ 닫기</button>
+  </div>
+</div>
+
+<!-- 05 건강 -->
+<div class="doc-panel" id="doc-health">
+  <div class="doc-inner">
+    <div class="doc-header">
+      <div class="doc-title-group">
+        <div class="doc-code">BRIEFING DOC · 05 / 06 · PUBLIC HEALTH</div>
+        <div class="doc-title">기후변화와 <span>건강</span></div>
+      </div>
+      <a class="video-btn" href="https://youtu.be/FwDkHqaDMqo" target="_blank">영상으로 보기</a>
+    </div>
+
+    <div class="doc-lead">
+      기후변화는 우리 몸에도 직접적인 위협이 됩니다. 폭염, 감염병, 대기오염, 알레르기. 지구가 더워지면서 우리의 건강을 위협하는 요인들이 동시에 강해지고 있습니다. 세계보건기구(WHO)는 기후변화를 <span class="danger">21세기 인류 건강에 대한 가장 큰 위협</span> 중 하나로 꼽고 있습니다.
+    </div>
+
+    <div class="doc-section">
+      <h3>🌡️ 폭염과 온열질환</h3>
+      <p>기온이 오를수록 폭염이 더 자주, 더 오래 지속됩니다. 폭염은 열탈진과 열사병을 일으킵니다. 열사병은 체온이 <span class="stat-box">40℃</span> 이상으로 오르며 뇌와 장기에 손상이 생겨 의식을 잃거나 사망에 이를 수 있는 심각한 상태입니다. 우리나라에서는 2018년 폭염으로 <span class="danger">1,500명 이상</span>이 온열질환으로 병원을 찾았습니다.</p>
+      <p>특히 노인, 어린이, 야외 노동자, 냉방 시설이 없는 저소득층이 가장 취약합니다. 밤에도 기온이 25℃ 이상인 열대야가 이어지면 수면의 질이 떨어지고 면역력이 약해집니다. 그리고 더위를 식히려 에어컨을 더 많이 켜면, 에어컨 실외기에서 나오는 열이 다시 도시를 뜨겁게 만드는 악순환이 생깁니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🦟 기후변화와 새로운 감염병</h3>
+      <p>지구 온난화로 열대 지방의 박쥐들이 온대 지방으로 이동하고 있습니다. 지난 100년간 중국 남부 지역에만 40종 이상의 열대 박쥐가 새로 유입되었고, 이 박쥐들이 보유한 코로나 바이러스만 <span class="danger">100종 이상</span>이 함께 들어왔습니다. 코로나19는 이러한 과정에서 인간에게 전파된 것으로 추정됩니다.</p>
+      <p>또한 기온이 오르면 모기와 진드기 같은 해충이 더 넓은 지역에서, 더 오랜 기간 활동합니다. 원래 열대 지방에서만 유행하던 뎅기열, 말라리아 같은 감염병이 이제 중위도 지역까지 퍼지고 있습니다. 우리나라에서도 말라리아 환자가 발생하고 있으며, 진드기가 옮기는 감염병 사망자가 매년 나오고 있습니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🌿 알레르기와 대기 오염</h3>
+      <p>기온이 오르면 꽃가루 시즌이 길어집니다. 더 나쁜 것은 이산화탄소 농도가 높아질수록 식물이 더 많은 꽃가루를 만들어낸다는 사실입니다. 알레르기 비염과 천식 환자들이 더 오랫동안 고통받게 됩니다. 기후변화로 봄이 일찍 찾아오면서 꽃가루 시즌이 수십 년 전보다 <span class="stat-box">3~4주</span> 앞당겨지고 있습니다.</p>
+      <p>폭염 때는 지표면 오존 농도도 높아집니다. 오존은 높은 하늘에 있으면 자외선을 차단해주는 고마운 존재이지만, 우리가 마시는 공기 속 오존은 폐를 직접 손상시킵니다. 더운 날 자동차와 공장에서 나오는 오염물질이 햇빛과 반응하면 오존이 만들어집니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🧬 자연과의 균형이 무너질 때</h3>
+      <p>인류가 자연을 개발하면서 지구 위 포유류와 새의 무게 중 <span class="danger">96~99%</span>가 인간과 가축의 무게로 채워졌습니다. 야생동물의 공간이 사라지면 동물들이 가진 바이러스가 인간에게 넘어올 가능성이 높아집니다. 코로나19는 시작에 불과할 수 있습니다. 기후변화로 서식지가 흔들리고 동물들이 이동하면서 이런 위험은 계속 커집니다. 자연을 지키는 것이 결국 우리 자신을 지키는 일입니다.</p>
+    </div>
+
+    <button class="close-btn" onclick="closeDoc('health')">▲ 닫기</button>
+  </div>
+</div>
+
+<!-- 06 먹거리 -->
+<div class="doc-panel" id="doc-food">
+  <div class="doc-inner">
+    <div class="doc-header">
+      <div class="doc-title-group">
+        <div class="doc-code">BRIEFING DOC · 06 / 06 · FOOD SECURITY</div>
+        <div class="doc-title">기후변화와 <span>먹거리</span></div>
+      </div>
+      <a class="video-btn" href="https://youtu.be/iiYbFrIRmuI" target="_blank">영상으로 보기</a>
+    </div>
+
+    <div class="doc-lead">
+      기후변화는 우리 밥상을 바꾸고 있습니다. 강원도에서 사과가 사라지고 있고, 한라봉이 경기도에서 자라고 있습니다. 이것은 신기한 뉴스가 아니라 <span class="danger">식량 위기의 시작</span>입니다. 우리가 지금 먹는 음식들이 수십 년 후에는 구하기 어려워질 수 있습니다.
+    </div>
+
+    <div class="doc-section">
+      <h3>🍎 북상하는 농작물</h3>
+      <p>30년 전 제주도에서만 자라던 한라봉과 감귤이 이제 경기도 안성에서도 재배됩니다. 한라봉의 재배 한계선은 북쪽으로 <span class="stat-box">200km</span>, 감귤은 <span class="stat-box">100km</span>나 올라왔습니다. 전남에서는 올리브 재배 면적이 1년 만에 10배로 늘었습니다. 강원도 철원처럼 겨울이 혹독하던 지역에서도 양파와 마늘이 재배되고 있습니다.</p>
+      <p>반면 우리가 알고 있는 대표 과일들은 사라지고 있습니다. 대구·경북의 명물이던 사과 주산지가 강원도로 올라갔고, <span class="danger">2090년에는 한반도 대부분에서 사과 재배가 불가능해질 수 있다</span>고 농촌진흥청은 경고합니다. 배, 포도도 마찬가지입니다. 과수원에서는 '과수화상병'이라는 병이 급속도로 번져 나무들이 고사하고 있습니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🌾 벼농사에도 영향</h3>
+      <p>쌀도 안심할 수 없습니다. 기온이 오르면 벼의 성장이 빨라지지만, 이삭이 패는 시기에 고온이 되면 쌀알이 제대로 여물지 않습니다. 이를 <span class="highlight">'고온 장해'</span>라고 합니다. 쌀알이 기형이 되거나 하얗게 변해 품질이 떨어집니다. 2020년 54일간의 장마로 벼 수확량이 7% 감소했고, 전북 일부 지역에서는 수확을 아예 포기하는 상황도 생겼습니다.</p>
+      <p>연구에 따르면 기온이 <span class="stat-box">1℃</span> 오를 때마다 쌀 수확량이 약 <span class="danger">10%</span> 감소할 수 있습니다. 앞으로 수십 년 안에 한반도 남쪽 논은 점차 사라질 수 있습니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🌍 세계 식량 안보 위기</h3>
+      <p>우리나라 식량 자급률은 약 <span class="stat-box">45%</span>입니다. 나머지 55%는 수입에 의존합니다. 기후변화로 전 세계 곡물 생산이 줄어들면 우리도 직격탄을 맞습니다. 전문가들은 지구 평균 기온이 1.5℃ 상승하는 <span class="danger">2030년경부터 식량 위기가 본격화</span>될 것이라고 경고합니다. 기온이 1℃ 오를 때마다 전 세계 곡물 생산량이 3~10% 줄어들며, 2050년에는 96억 명의 인구가 지금보다 35% 더 많은 식량을 필요로 하지만 생산은 오히려 줄어들 것입니다.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>🐝 꿀벌이 사라지면 밥상도 사라진다</h3>
+      <p>전 세계 식량 작물의 약 <span class="highlight">70%</span>는 꿀벌이 수분을 도와야만 열매를 맺습니다. 딸기, 사과, 아몬드, 토마토가 모두 꿀벌 없이는 자랄 수 없습니다. 그런데 기후변화로 꽃 피는 시기가 달라지고, 살충제와 서식지 파괴가 겹치면서 꿀벌이 급감하고 있습니다. 2006년 이후 미국에서만 매년 약 <span class="danger">30~40%</span>의 꿀벌 군집이 사라지는 '군집 붕괴 현상(CCD)'이 보고됩니다. 꿀벌 하나가 사라지면 우리 밥상의 절반 이상이 함께 사라질 수 있습니다.</p>
+    </div>
+
+    <button class="close-btn" onclick="closeDoc('food')">▲ 닫기</button>
+  </div>
+</div>
+
+<footer>
+  GOCHON MIDDLE SCHOOL · SCIENCE THINK TANK · 2026 · CLASS 1<br>
+  <span style="color:rgba(0,232,160,0.4)">// 지구를 구하는 탐구는 지금 시작됩니다</span>
+</footer>
+
+<script>
+// ── 별 캔버스 ──
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let stars = [];
+
+function resizeCanvas() {
+  canvas.width  = window.innerWidth;
+  canvas.height = document.body.scrollHeight;
+}
+
+function initStars() {
+  stars = [];
+  for (let i = 0; i < 280; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.4 + 0.2,
+      a: Math.random(),
+      speed: Math.random() * 0.008 + 0.002
+    });
+  }
+}
+
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    s.a += s.speed;
+    const alpha = (Math.sin(s.a) + 1) / 2;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(180,255,220,${alpha * 0.7})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+
+resizeCanvas();
+initStars();
+drawStars();
+window.addEventListener('resize', () => { resizeCanvas(); initStars(); });
+
+// ── 제시문 열기/닫기 ──
+let currentDoc = null;
+
+function openDoc(id) {
+  if (currentDoc) {
+    document.getElementById('doc-' + currentDoc).classList.remove('active');
+    document.querySelectorAll('.topic-card').forEach(c => c.classList.remove('active'));
+  }
+
+  if (currentDoc === id) {
+    currentDoc = null;
+    return;
+  }
+
+  currentDoc = id;
+  const panel = document.getElementById('doc-' + id);
+  panel.classList.add('active');
+
+  // 카드 active
+  const cards = document.querySelectorAll('.topic-card');
+  const map = ['ocean','bio','energy','disaster','health','food'];
+  const idx = map.indexOf(id);
+  if (idx >= 0) cards[idx].classList.add('active');
+
+  // 스크롤
+  setTimeout(() => {
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 80);
+}
+
+function closeDoc(id) {
+  document.getElementById('doc-' + id).classList.remove('active');
+  document.querySelectorAll('.topic-card').forEach(c => c.classList.remove('active'));
+  currentDoc = null;
+
+  // 그리드로 스크롤
+  document.getElementById('topicGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
