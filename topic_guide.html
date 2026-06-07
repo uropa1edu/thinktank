@@ -129,30 +129,6 @@
   }
   .howto-text { font-size: 13px; color: var(--text-dim); line-height: 1.6; word-break: keep-all; }
 
-  .pick-bar {
-    margin-top: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 12px 20px;
-    background: rgba(91,138,255,.08);
-    border: 1px solid rgba(91,138,255,.2);
-    border-radius: 10px;
-    font-size: 13px;
-    color: var(--accent);
-    letter-spacing: .02em;
-  }
-  .pick-count {
-    font-family: 'Space Mono', monospace;
-    font-weight: 700;
-    background: var(--accent);
-    color: #06060c;
-    border-radius: 20px;
-    padding: 2px 12px;
-    font-size: 13px;
-  }
-
   /* ─── TOPIC CARDS ─────────────────────────────── */
   .topics { max-width: 900px; margin: 0 auto; padding: 0 40px 70px; display: flex; flex-direction: column; gap: 14px; }
 
@@ -164,10 +140,6 @@
     transition: border-color .2s, box-shadow .25s, background .2s;
   }
   .topic-card:hover { border-color: var(--border-bright); }
-  .topic-card.selected {
-    border-color: var(--topic);
-    box-shadow: 0 0 0 1px var(--topic), 0 8px 30px -10px var(--topic);
-  }
 
   .topic-head {
     padding: 20px 22px;
@@ -199,27 +171,6 @@
   .topic-hook { font-size: 12px; color: var(--text-dim); margin-top: 4px; word-break: keep-all; }
 
   .topic-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-  .star-btn {
-    border: 1px solid var(--border-bright);
-    background: transparent;
-    color: var(--text-dim);
-    font-size: 13px;
-    font-family: 'Noto Sans KR', sans-serif;
-    padding: 7px 13px;
-    border-radius: 20px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all .18s;
-    display: flex; align-items: center; gap: 5px;
-  }
-  .star-btn:hover { border-color: var(--topic); color: var(--text); }
-  .star-btn .star { font-size: 14px; line-height: 1; }
-  .topic-card.selected .star-btn {
-    background: var(--topic);
-    border-color: var(--topic);
-    color: #06060c;
-    font-weight: 700;
-  }
   .topic-toggle {
     font-size: 20px;
     font-weight: 300;
@@ -294,7 +245,6 @@
     .howto-cards { grid-template-columns: 1fr; }
     .ex-grid { grid-template-columns: 1fr; }
     .topic-head { flex-wrap: wrap; gap: 12px; }
-    .star-btn .label-full { display: none; }
   }
 </style>
 </head>
@@ -311,7 +261,7 @@
   <p class="eyebrow">CLIMATE CHANGE · 6 TOPICS</p>
   <h1>🌍 지구를 구하는 과학 싱크탱크</h1>
   <p class="title-big">탐구 토픽 안내서</p>
-  <h2>6개의 주제를 함께 읽고, 가장 탐구하고 싶은 주제를 골라보세요</h2>
+  <h2>6개의 주제를 읽고, 가장 탐구하고 싶은 주제를 골라보세요</h2>
 </section>
 
 <!-- HOW TO USE -->
@@ -320,20 +270,16 @@
   <div class="howto-cards">
     <div class="howto-card">
       <div class="howto-num">01</div>
-      <div class="howto-text">6개 주제를 모둠원이 함께 읽어보세요.</div>
+      <div class="howto-text">6개 주제를 찬찬히 읽어보세요.</div>
     </div>
     <div class="howto-card">
       <div class="howto-num">02</div>
-      <div class="howto-text">마음에 드는 주제를 ☆ 별표로 표시해보세요.</div>
+      <div class="howto-text">관심이 가는 주제의 탐구 예시를 확인해보세요.</div>
     </div>
     <div class="howto-card">
       <div class="howto-num">03</div>
-      <div class="howto-text">가장 탐구하고 싶은 주제를 골라 이야기 나눠보세요.</div>
+      <div class="howto-text">가장 탐구하고 싶은 주제를 골라보세요.</div>
     </div>
-  </div>
-  <div class="pick-bar">
-    <span>우리 모둠이 고른 주제</span>
-    <span class="pick-count" id="pickCount">0개</span>
   </div>
 </section>
 
@@ -350,7 +296,6 @@
         <div class="topic-hook">따뜻해지는 바다, 높아지는 해수면, 산성으로 변하는 바닷물</div>
       </div>
       <div class="topic-actions">
-        <button class="star-btn" onclick="toggleStar(event, this)"><span class="star">☆</span><span class="label-full">관심</span></button>
         <span class="topic-toggle">+</span>
       </div>
     </div>
@@ -376,7 +321,6 @@
         <div class="topic-hook">꽃 피는 시기, 철새 이동, 흔들리는 먹이사슬</div>
       </div>
       <div class="topic-actions">
-        <button class="star-btn" onclick="toggleStar(event, this)"><span class="star">☆</span><span class="label-full">관심</span></button>
         <span class="topic-toggle">+</span>
       </div>
     </div>
@@ -402,7 +346,6 @@
         <div class="topic-hook">집중호우와 가뭄, 폭염과 도시 열섬</div>
       </div>
       <div class="topic-actions">
-        <button class="star-btn" onclick="toggleStar(event, this)"><span class="star">☆</span><span class="label-full">관심</span></button>
         <span class="topic-toggle">+</span>
       </div>
     </div>
@@ -428,7 +371,6 @@
         <div class="topic-hook">화석연료에서 재생에너지로, 기후변화의 핵심 열쇠</div>
       </div>
       <div class="topic-actions">
-        <button class="star-btn" onclick="toggleStar(event, this)"><span class="star">☆</span><span class="label-full">관심</span></button>
         <span class="topic-toggle">+</span>
       </div>
     </div>
@@ -454,7 +396,6 @@
         <div class="topic-hook">북상하는 사과밭, 사라진 명태, 흔들리는 밥상</div>
       </div>
       <div class="topic-actions">
-        <button class="star-btn" onclick="toggleStar(event, this)"><span class="star">☆</span><span class="label-full">관심</span></button>
         <span class="topic-toggle">+</span>
       </div>
     </div>
@@ -480,7 +421,6 @@
         <div class="topic-hook">폭염·감염병·호흡기 질환, 우리 몸에 닿는 기후변화</div>
       </div>
       <div class="topic-actions">
-        <button class="star-btn" onclick="toggleStar(event, this)"><span class="star">☆</span><span class="label-full">관심</span></button>
         <span class="topic-toggle">+</span>
       </div>
     </div>
@@ -506,23 +446,6 @@
 <script>
 function toggleTopic(headEl) {
   headEl.closest('.topic-card').classList.toggle('open');
-}
-
-function toggleStar(e, btn) {
-  e.stopPropagation();                 // 카드 펼침과 분리
-  const card = btn.closest('.topic-card');
-  card.classList.toggle('selected');
-  const star = btn.querySelector('.star');
-  const label = btn.querySelector('.label-full');
-  const on = card.classList.contains('selected');
-  star.textContent = on ? '★' : '☆';
-  if (label) label.textContent = on ? '선택됨' : '관심';
-  updateCount();
-}
-
-function updateCount() {
-  const n = document.querySelectorAll('.topic-card.selected').length;
-  document.getElementById('pickCount').textContent = n + '개';
 }
 </script>
 </body>
