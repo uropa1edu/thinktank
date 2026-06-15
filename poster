@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기후변화 탐구 포스터</title>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyD4OctEQwT6WTxDN8dbCXWTYGhXwhrNUcQ",
+  authDomain:        "climate-poster.firebaseapp.com",
+  databaseURL:       "https://climate-poster-default-rtdb.firebaseio.com",
+  projectId:         "climate-poster",
+  storageBucket:     "climate-poster.firebasestorage.app",
+  messagingSenderId: "414683201529",
+  appId:             "1:414683201529:web:8b9a216ca1336e19d14728"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+let key=null, syncing=false, timer=null, _unsub=null;
+
+const collect = () => {
+  const photos=[], caps=[];
+  document.querySelectorAll('.ps').forEach(w=>{
+    photos.push(w.querySelector('.pslot').dataset.img||'');
+    caps.push(w.querySelector('.pcap').innerText||'');
+  });
+  const sz={}, cl={};
+  document.querySelectorAll('[data-fk]').forEach(e=>sz[e.dataset.fk]=e.dataset.fs||'13');
+  document.querySelectorAll('.card[data-sid]').forEach(e=>cl[e.dataset.sid]=e.querySelector('.chdr').style.background||'');
+  const g=id=>document.getElementById(id)?.innerHTML||'';
+  const v=id=>document.getElementById(id)?.value||'';
+  return { title:g('f-title'),
+    members:v('m-members'), date:v('m-date'),
+    school:v('sel-school'), group:v('sel-group'), topic:v('sel-topic'),
+    motive:g('f-motive'), question:g('f-question'), hypo:g('f-hypo'),
+    bg1:g('f-bg1'), bg2:g('f-bg2'), proc:g('f-proc'),
+    data:g('f-data'), conc:g('f-conc'),
+    climlink:g('f-climlink'), disc:g('f-disc'),
+    refs:g('f-refs'), newq:g('f-newq'), photos, caps, sz, cl, savedAt:new Date().toISOString() };
+};
+
+const apply = d => {
+  const sh=(id,h)=>{const e=document.getElementById(id);if(e&&document.activeElement!==e)e.innerHTML=h||'';};
+  const sv=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v||'';};
+  sh('f-title',d.title);
+  sv('m-members',d.members); sv('m-date',d.date);
+  sv('sel-topic',d.topic||'');
+  updateBadge();
+  ['motive','question','hypo','bg1','bg2','proc','data','conc','climlink','disc','newq','refs']
+    .forEach(k=>sh('f-'+k, d[k]||''));
+  if(d.sz) Object.entries(d.sz).forEach(([k,v])=>{
+    const el=document.querySelector(`[data-fk="${k}"]`);
+    if(el){el.dataset.fs=v;el.style.fontSize=v+'px';}
+  });
+  if(d.cl) Object.entries(d.cl).forEach(([k,v])=>{
+    const el=document.querySelector(`.card[data-sid="${k}"] .chdr`);
+    if(el&&v) el.style.background=v;
+  });
+  if(d.photos?.length){
+    const slots=document.querySelectorAll('.ps');
+    slots.forEach((w,i)=>{
+      if(d.photos[i]){const s=w.querySelector('.pslot');s.dataset.img=d.photos[i];renderPhoto(s,d.photos[i]);}
+      if(d.caps?.[i]) w.querySelector('.pcap').innerText=d.caps[i];
+    });
+  }
+};
+
+window._fb_save = ()=>{
+  if(!key){toast('먼저 [✓ 연결]을 눌러주세요','w');return;}
+  set(ref(db,`posters/${key}`),collect()).then(()=>toast('☁️ 저장됨','ok')).catch(e=>toast(e.message,'e'));
+};
+
+window._fb_connect = ()=>{
+  const sn=window._sanitize, school=sn(document.getElementById('sel-school').value);
+  const group=sn(document.getElementById('sel-group').value);
+  if(!school){toast('학교 코드를 입력하세요 (영문·숫자, 예: gochon1)','w');return;}
+  if(!group){toast('모둠 코드를 입력하세요 (영문·숫자, 예: a1)','w');return;}
+  key=`poster_${school}_${group}`;
+  if(_unsub){_unsub();_unsub=null;}
+  if(window.clearPoster) window.clearPoster();
+  _unsub = onValue(ref(db,`posters/${key}`),snap=>{
+    if(!snap.exists()){ syncing=false; return; }
+    syncing=true; apply(snap.val());
+    setTimeout(()=>syncing=false,300);
+    setSyncDot(true);
+  });
+  updateBadge();
+  toast(`[${school}/${group}] 연결됨 ✓`,'ok');
+};
+
+window._autosave = ()=>{
+  if(syncing)return;
+  clearTimeout(timer);
+  timer=setTimeout(()=>{if(key)window._fb_save();},1500);
+};
+</script>
+
+<style>
+@font-face{font-family:'FP';src:url('https://cdn.jsdelivr.net/gh/fonts-archive/Freesentation/Freesentation-3Light.woff2')format('woff2');font-weight:300}
+@font-face{font-family:'FP';src:url('https://cdn.jsdelivr.net/gh/fonts-archive/Freesentation/Freesentation-4Regular.woff2')format('woff2');font-weight:400}
+@font-face{font-family:'FP';src:url('https://cdn.jsdelivr.net/gh/fonts-archive/Freesentation/Freesentation-6SemiBold.woff2')format('woff2');font-weight:600}
+@font-face{font-family:'FP';src:url('https://cdn.jsdelivr.net/gh/fonts-archive/Freesentation/Freesentation-7Bold.woff2')format('woff2');font-weight:700}
+@font-face{font-family:'FP';src:url('https://cdn.jsdelivr.net/gh/fonts-archive/Freesentation/Freesentation-9Black.woff2')format('woff2');font-weight:900}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body,input,select,button,[contenteditable]{font-family:'FP','Apple SD Gothic Neo','Malgun Gothic',sans-serif!important}
+body{background:#dde2ea;min-height:100vh}
+
+/* ══ TOOLBAR ══ */
+#tb{position:sticky;top:0;z-index:200;background:#0b2d50;height:52px;display:flex;align-items:center;padding:0 16px;gap:8px;box-shadow:0 2px 20px rgba(0,0,0,.4)}
+.tb-logo{font-size:13px;font-weight:900;color:#7ecfea;white-space:nowrap;letter-spacing:-.01em}
+.tb-div{width:1px;height:26px;background:rgba(255,255,255,.12);flex-shrink:0}
+.tb-lbl{font-size:10px;color:rgba(255,255,255,.4);white-space:nowrap}
+.tb-inp{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:13px;font-weight:600;padding:4px 9px;border-radius:6px;outline:none}
+.tb-inp:focus{border-color:#7ecfea}
+.tb-inp::placeholder{color:rgba(255,255,255,.3);font-weight:400}
+/* ★ 드롭다운 글씨 버그 수정 ★ */
+.tb-inp option{color:#1a1a2e;background:#fff;font-weight:600}
+.tb-sel{cursor:pointer}
+.tb-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;border-radius:6px;border:none;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.tb-btn:active{transform:scale(.95)}
+.b-conn{background:#52b8e0;color:#0b2d50}
+.b-conn:hover{background:#7ecfea}
+.b-save{background:#1a6faa;color:#fff}
+.b-save:hover{background:#1a8ad4}
+.b-ghost{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.12)}
+.b-ghost:hover{background:rgba(255,255,255,.15)}
+.b-print{background:#e07830;color:#fff;margin-left:auto}
+.b-print:hover{background:#d06020}
+#tdisplay{font-size:11px;font-weight:700;color:#7ecfea;background:rgba(255,255,255,.08);padding:3px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.14);min-width:70px;text-align:center;white-space:nowrap}
+#sdot{width:7px;height:7px;border-radius:50%;background:#444;transition:background .4s;flex-shrink:0}
+#sdot.on{background:#4de89a;box-shadow:0 0 6px #4de89a}
+
+/* ══ 글씨크기 플로팅 ══ */
+#ftb{position:fixed;z-index:500;background:#0e2040;border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:7px 12px;display:none;align-items:center;gap:8px;box-shadow:0 6px 28px rgba(0,0,0,.5)}
+#ftb.on{display:flex}
+.fsz-btn{width:24px;height:24px;border-radius:5px;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.fsz-btn:hover{background:rgba(255,255,255,.22)}
+#fsz-val{font-size:13px;font-weight:700;color:#fff;min-width:32px;text-align:center}
+.fp-btn{padding:3px 7px;border-radius:4px;border:none;background:rgba(255,255,255,.1);color:rgba(255,255,255,.75);font-size:11px;cursor:pointer}
+.fp-btn:hover{background:rgba(255,255,255,.2)}
+
+/* ══ 색상 팝업 ══ */
+#cpop{position:fixed;z-index:500;background:#0e2040;border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:10px 13px;display:none;flex-direction:column;gap:8px;box-shadow:0 6px 28px rgba(0,0,0,.5);min-width:210px}
+#cpop.on{display:flex}
+.cp-title{font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.06em}
+.cp-sw{display:flex;flex-wrap:wrap;gap:5px}
+.sw{width:24px;height:24px;border-radius:5px;cursor:pointer;border:2px solid #333;transition:transform .12s}
+.sw:hover{transform:scale(1.18);border-color:rgba(255,255,255,.6)!important}
+.cp-row{display:flex;align-items:center;gap:8px}
+.cp-row input[type=color]{width:30px;height:26px;border:none;border-radius:5px;cursor:pointer;padding:0;background:none}
+.cp-row span{font-size:10px;color:rgba(255,255,255,.45)}
+.cp-reset{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.65);font-size:10px;font-weight:700;padding:3px 9px;border-radius:5px;cursor:pointer}
+.cp-reset:hover{background:rgba(255,255,255,.2)}
+
+/* ══ POSTER WRAP ══ */
+#pw{display:flex;justify-content:center;padding:28px 16px 60px}
+#poster{width:860px;height:1216px;background:#fdfcfa;box-shadow:0 8px 50px rgba(11,45,80,.25);border-radius:5px;overflow:hidden;display:flex;flex-direction:column;flex-shrink:0}
+
+/* ── HEADER ── */
+#phdr{background:linear-gradient(135deg,#0b3d6b 0%,#0d5490 55%,#0c7a7a 100%);padding:18px 42px 14px;position:relative;overflow:hidden;flex-shrink:0}
+#phdr::before{content:'';position:absolute;top:-80px;right:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(240,180,41,.1),transparent 70%)}
+#phdr::after{content:'';position:absolute;bottom:-50px;left:60px;width:350px;height:150px;border-radius:50%;background:radial-gradient(ellipse,rgba(12,122,122,.15),transparent 70%)}
+.h-top{display:flex;justify-content:flex-end;align-items:center;margin-bottom:8px;position:relative;z-index:1}
+.h-sub{font-size:11px;font-weight:900;color:#fff;letter-spacing:.04em}
+#h-badge{display:inline-block;background:rgba(240,180,41,.2);border:1px solid rgba(240,180,41,.4);color:#f0c040;font-size:10px;font-weight:700;padding:2px 11px;border-radius:20px;margin-bottom:7px;position:relative;z-index:1;letter-spacing:.04em}
+#f-title{font-size:28px;font-weight:900;color:#fff;line-height:1.3;outline:none;position:relative;z-index:1;border-bottom:2px dashed rgba(255,255,255,.2);padding-bottom:8px;margin-bottom:12px;-webkit-text-fill-color:#fff;min-height:40px}
+#f-title:focus{border-color:rgba(255,255,255,.5)}
+#f-title:empty::before{content:'탐구 제목을 입력하세요';color:rgba(255,255,255,.3);font-weight:400;font-size:24px}
+.h-meta{display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+.mc{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:3px 10px}
+.mc-l{font-size:9px;color:rgba(255,255,255,.45);white-space:nowrap}
+.mc-v{background:transparent;border:none;color:#fff;font-size:12px;font-weight:700;outline:none}
+.mc-v::placeholder{color:rgba(255,255,255,.3);font-weight:400}
+
+/* ── BODY ── */
+#pbody{padding:12px 30px 14px;display:grid;grid-template-columns:1fr 1fr;gap:9px;flex:1;overflow:hidden;align-content:stretch}
+.full{grid-column:1/-1}
+.card{background:#fff;border:1px solid #dde2ea;border-radius:9px;overflow:hidden;box-shadow:0 1px 8px rgba(11,45,80,.07);display:flex;flex-direction:column;transition:box-shadow .2s,border-color .2s}
+.card:focus-within{box-shadow:0 4px 20px rgba(11,45,80,.13);border-color:#1a7fc4}
+.chdr{display:flex;align-items:center;justify-content:space-between;padding:5px 11px;flex-shrink:0}
+.chdr-l{display:flex;align-items:center;gap:7px}
+.cico{width:20px;height:20px;border-radius:4px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.ctitle{font-size:12px;font-weight:900;color:#fff;letter-spacing:.04em}
+.cbtn{background:rgba(255,255,255,.18);border:none;color:rgba(255,255,255,.85);font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;cursor:pointer;transition:background .15s}
+.cbtn:hover{background:rgba(255,255,255,.32)}
+.c-blue .chdr{background:linear-gradient(90deg,#1565a8,#0b3d6b)}
+.c-teal .chdr{background:linear-gradient(90deg,#0c7a7a,#085858)}
+.c-warm .chdr{background:linear-gradient(90deg,#c04818,#8c2e08)}
+.c-green .chdr{background:linear-gradient(90deg,#1a7a50,#0a4a28)}
+.c-purple .chdr{background:linear-gradient(90deg,#5a3888,#381860)}
+.c-dark .chdr{background:linear-gradient(90deg,#2a2a4a,#141428)}
+.cbody{padding:8px 11px;flex:1;display:flex;flex-direction:column;gap:5px;transition:background .2s}
+.slbl{font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.sl-blue{color:#1565a8}.sl-teal{color:#0c7a7a}.sl-warm{color:#c04818}.sl-green{color:#1a7a50}.sl-purple{color:#5a3888}.sl-dark{color:#2a2a4a}
+.sdiv{height:1px;background:#e8ecf2;margin:3px 0}
+.i2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f{font-family:'FP','Apple SD Gothic Neo','Malgun Gothic',sans-serif!important;font-size:13px;font-weight:400;line-height:1.65;color:#1a1a2e;outline:none;border-radius:5px;padding:4px 6px;width:100%;transition:background .15s;min-height:48px}
+.f:focus{background:rgba(21,101,168,.05)}
+.f:empty::before{content:attr(data-ph);color:#c5c0b8;font-style:italic;font-size:11px;pointer-events:none;display:block;font-weight:400}
+.f-lg{min-height:62px}
+.f-ref{font-size:11px;color:#4a4a6a;line-height:1.85;min-height:28px}
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.ps{display:flex;flex-direction:column;gap:2px}
+.pslot{aspect-ratio:5/4;border:2px dashed #aacde8;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;background:#f0f6fd;transition:border-color .2s,background .2s}
+.pslot:hover{border-color:#1565a8;background:#e0edf9}
+.pslot.has{border-style:solid;border-color:#3a9ad4}
+.pslot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pov{position:absolute;inset:0;background:rgba(11,45,80,.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;flex-direction:column;gap:2px}
+.pslot:hover .pov{opacity:1}
+.pov span{color:#fff;font-size:9px;font-weight:700}
+.pph{display:flex;flex-direction:column;align-items:center;gap:4px;color:#80b0d0;pointer-events:none}
+.pph svg{width:22px;height:22px;opacity:.6}
+.pph span{font-size:9px;font-weight:700;color:#5a88aa}
+.pcap{font-family:'FP',sans-serif!important;font-size:9px;color:#4a4a6a;text-align:center;outline:none;border-radius:3px;padding:0px 2px;transition:background .15s;min-height:14px}
+.pcap:focus{background:rgba(21,101,168,.06)}
+.pcap:empty::before{content:'사진 설명';color:#ccc;font-style:italic}
+#pfoot{background:linear-gradient(90deg,#0b3d6b,#0c7a7a);padding:7px 42px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.f-l{font-size:11px;font-weight:700;color:rgba(255,255,255,.88)}
+.f-r{font-size:10px;color:rgba(255,255,255,.42)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(14px);padding:8px 20px;border-radius:22px;font-size:12px;font-weight:700;opacity:0;transition:all .3s;z-index:9999;pointer-events:none;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.ok{background:#1a6faa;color:#fff}
+#toast.w{background:#e07830;color:#fff}
+#toast.e{background:#c03030;color:#fff}
+@media print{
+  #tb,#ftb,#cpop,#toast,.pov,.cbtn,.pph{display:none!important}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+  body{background:#fff;margin:0}
+  #pw{padding:0;background:#fff}
+  #poster{width:860px;height:1216px;box-shadow:none;border-radius:0;overflow:hidden;transform-origin:top left}
+  .f:empty::before{display:none}
+  @page{size:A1 portrait;margin:0}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ TOOLBAR ══ -->
+<div id="tb">
+  <span class="tb-logo">🌍 기후변화 탐구 포스터</span>
+  <div class="tb-div"></div>
+  <span class="tb-lbl">학교코드</span>
+  <input class="tb-inp" id="sel-school" style="width:96px" placeholder="예: gochon1" autocomplete="off" oninput="onMetaInput()">
+  <span class="tb-lbl">모둠코드</span>
+  <input class="tb-inp" id="sel-group" style="width:72px" placeholder="예: a1" autocomplete="off" oninput="onMetaInput()">
+  <select class="tb-inp tb-sel" id="sel-topic" style="width:160px" onchange="onTopicChange()">
+    <option value="">— 주제 선택 —</option>
+    <option value="🌊 기후변화와 바다">🌊 기후변화와 바다</option>
+    <option value="🌿 기후변화와 생물">🌿 기후변화와 생물</option>
+    <option value="⚡ 기후변화와 에너지">⚡ 기후변화와 에너지</option>
+    <option value="🌪️ 기후변화와 재난">🌪️ 기후변화와 재난</option>
+    <option value="🏥 기후변화와 건강">🏥 기후변화와 건강</option>
+    <option value="🌾 기후변화와 먹거리">🌾 기후변화와 먹거리</option>
+  </select>
+  <button class="tb-btn b-conn" onclick="fbConnect()">✓ 연결</button>
+  <div id="tdisplay">미연결</div>
+  <div id="sdot"></div>
+  <div class="tb-div"></div>
+  <button class="tb-btn b-save" onclick="fbSave()">☁️ 저장</button>
+  <button class="tb-btn b-ghost" onclick="dlJSON()">💾 백업</button>
+  <label class="tb-btn b-ghost" style="cursor:pointer">📂 열기<input type="file" accept=".json" onchange="ldJSON(event)" style="display:none"></label>
+  <button class="tb-btn b-print" onclick="window.print()">🖨️ 인쇄</button>
+</div>
+
+<!-- ══ 글씨 크기 플로팅 ══ -->
+<div id="ftb">
+  <span style="font-size:9px;color:rgba(255,255,255,.4)">글씨 크기</span>
+  <button class="fsz-btn" onclick="fsz(-1)">−</button>
+  <span id="fsz-val">13px</span>
+  <button class="fsz-btn" onclick="fsz(+1)">＋</button>
+  <button class="fp-btn" onclick="fszSet(11)">소</button>
+  <button class="fp-btn" onclick="fszSet(13)">중</button>
+  <button class="fp-btn" onclick="fszSet(15)">대</button>
+  <button class="fp-btn" onclick="fszSet(18)">특대</button>
+</div>
+
+<!-- ══ 색상 팝업 ══ -->
+<div id="cpop">
+  <div class="cp-title">헤더 색상 (어두운 그라데이션)</div>
+  <div class="cp-sw" id="cp-sw"></div>
+  <div class="cp-row">
+    <input type="color" id="cp-custom" value="#1a1a2e" oninput="applyColor(this.value)">
+    <span>직접 선택</span>
+    <button class="cp-reset" onclick="resetColor()">초기화</button>
+  </div>
+</div>
+
+<!-- ══ POSTER ══ -->
+<div id="pw"><div id="poster">
+
+<!-- HEADER -->
+<div id="phdr">
+  <div class="h-top">
+    <span class="h-sub">🌿 기후변화 탐구 포스터</span>
+  </div>
+  <div id="h-badge">학교코드·모둠코드·주제를 선택해주세요</div>
+  <div id="f-title" contenteditable="true" spellcheck="false" data-fk="title" data-fs="28" oninput="as()"></div>
+  <div class="h-meta">
+    <div class="mc"><span class="mc-l">팀원</span><input class="mc-v" id="m-members" placeholder="이름, 이름, 이름" style="width:200px" oninput="as()"></div>
+    <div class="mc"><span class="mc-l">날짜</span><input class="mc-v" id="m-date" type="date" style="width:116px" oninput="as()"></div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div id="pbody">
+
+<div class="card c-blue full" data-sid="motive" style="height:auto">
+  <div class="chdr"><div class="chdr-l"><div class="cico">💡</div><span class="ctitle">탐구 동기 · 질문 · 가설</span></div><button class="cbtn" onclick="openCP(event,'motive')">🎨</button></div>
+  <div class="cbody" style="flex-direction:row;gap:0;padding:0">
+    <div style="flex:1;padding:9px 11px;border-right:1px solid #e8ecf2">
+      <div class="slbl sl-blue">💡 탐구 동기</div>
+      <div class="f" id="f-motive" contenteditable="true" spellcheck="false" data-ph="왜 이 주제를 탐구하게 됐나요?" data-fk="motive" data-fs="13" style="min-height:56px" oninput="as()"></div>
+    </div>
+    <div style="flex:1;padding:9px 11px;border-right:1px solid #e8ecf2">
+      <div class="slbl sl-blue">❓ 탐구 질문</div>
+      <div class="f" id="f-question" contenteditable="true" spellcheck="false" data-ph="우리 팀이 탐구하고 싶은 질문을 명확하게 써주세요." data-fk="question" data-fs="13" style="min-height:56px" oninput="as()"></div>
+    </div>
+    <div style="flex:1;padding:9px 11px">
+      <div class="slbl sl-blue">💭 가설</div>
+      <div class="f" id="f-hypo" contenteditable="true" spellcheck="false" data-ph="~하면 ~할 것이다. 왜냐하면 ~이기 때문이다." data-fk="hypo" data-fs="13" style="min-height:56px" oninput="as()"></div>
+    </div>
+  </div>
+</div>
+
+<div class="card c-teal full" data-sid="bg" style="flex-shrink:0;font-size:0">
+  <div class="chdr"><div class="chdr-l"><div class="cico">📚</div><span class="ctitle">이론적 배경</span></div><button class="cbtn" onclick="openCP(event,'bg')">🎨</button></div>
+  <div class="cbody">
+    <div class="i2" style="flex:1">
+      <div style="display:flex;flex-direction:column">
+        <div class="slbl sl-teal">🌡️ 지구온난화와의 연관성</div>
+        <div class="f f-lg" id="f-bg1" contenteditable="true" spellcheck="false" data-ph="지구온난화로 인해 이 주제와 관련된 어떤 변화가 일어나고 있나요? 온실가스, 기온 상승, 해수면 변화 등과 연결지어 설명하세요." data-fk="bg1" data-fs="13" style="flex:1;min-height:32px" oninput="as()"></div>
+      </div>
+      <div style="display:flex;flex-direction:column">
+        <div class="slbl sl-teal">🔬 관련 과학 원리</div>
+        <div class="f f-lg" id="f-bg2" contenteditable="true" spellcheck="false" data-ph="탐구 질문과 직접 관련된 과학 개념과 원리를 완성된 문장으로 작성하세요." data-fk="bg2" data-fs="13" style="flex:1;min-height:32px" oninput="as()"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card c-warm" data-sid="method" style="flex:6">
+  <div class="chdr"><div class="chdr-l"><div class="cico">🔬</div><span class="ctitle">탐구 방법</span></div><button class="cbtn" onclick="openCP(event,'method')">🎨</button></div>
+  <div class="cbody">
+    <div class="slbl sl-warm">🔢 실험 과정</div>
+    <div class="f" id="f-proc" contenteditable="true" spellcheck="false" data-ph="① 첫 번째 단계를 자세히 기술하세요.&#10;② 두 번째 단계&#10;③ 세 번째 단계" data-fk="proc" data-fs="13" style="flex:1;min-height:80px" oninput="as()"></div>
+  </div>
+</div>
+
+<div class="card c-green" data-sid="result" style="flex:6">
+  <div class="chdr"><div class="chdr-l"><div class="cico">📊</div><span class="ctitle">탐구 결과</span></div><button class="cbtn" onclick="openCP(event,'result')">🎨</button></div>
+  <div class="cbody">
+    <div class="f" id="f-data" contenteditable="true" spellcheck="false" data-ph="관찰한 것, 측정한 수치, 그래프 설명 등 탐구 결과를 자유롭게 작성하세요." data-fk="data" data-fs="13" style="flex:1;min-height:80px" oninput="as()"></div>
+  </div>
+</div>
+
+<div class="card c-green full" data-sid="photo" style="flex-shrink:0">
+  <div class="chdr"><div class="chdr-l"><div class="cico">📷</div><span class="ctitle">탐구 사진</span></div><button class="cbtn" onclick="openCP(event,'photo')">🎨</button></div>
+  <div class="cbody" style="padding:6px 11px">
+    <div class="pgrid" id="photo-area"></div>
+  </div>
+</div>
+
+<div class="card c-purple" data-sid="conc" style="flex-shrink:0">
+  <div class="chdr"><div class="chdr-l"><div class="cico">✅</div><span class="ctitle">결론</span></div><button class="cbtn" onclick="openCP(event,'conc')">🎨</button></div>
+  <div class="cbody" style="gap:3px">
+    <div class="slbl sl-purple">탐구 결과 요약</div>
+    <div class="f" id="f-conc" contenteditable="true" spellcheck="false" data-ph="가설과 비교하여 탐구 결과를 정리하세요." data-fk="conc" data-fs="13" style="flex:1;min-height:24px" oninput="as()"></div>
+    <div class="sdiv"></div>
+    <div class="slbl sl-purple">기후변화와의 연결</div>
+    <div class="f" id="f-climlink" contenteditable="true" spellcheck="false" data-ph="이 탐구 결과가 기후변화와 어떻게 연결되나요?" data-fk="climlink" data-fs="13" style="flex:1;min-height:24px" oninput="as()"></div>
+  </div>
+</div>
+
+<div class="card c-purple" data-sid="disc" style="flex-shrink:0">
+  <div class="chdr"><div class="chdr-l"><div class="cico">💬</div><span class="ctitle">토의</span></div><button class="cbtn" onclick="openCP(event,'disc')">🎨</button></div>
+  <div class="cbody" style="gap:4px">
+    <div class="slbl sl-purple">오차 및 한계</div>
+    <div class="f" id="f-disc" contenteditable="true" spellcheck="false" data-ph="실험에서 오차가 생긴 원인, 한계점은?" data-fk="disc" data-fs="13" style="min-height:36px;max-height:48px;overflow:auto" oninput="as()"></div>
+    <div class="sdiv"></div>
+    <div class="slbl sl-purple" style="color:#c04818">❓ 탐구 후 새로운 질문</div>
+    <div class="f" id="f-newq" contenteditable="true" spellcheck="false" data-ph="이 탐구를 하면서 새롭게 생긴 궁금증을 질문으로 써주세요." data-fk="newq" data-fs="13" style="min-height:28px" oninput="as()"></div>
+  </div>
+</div>
+
+<div class="card c-dark full" data-sid="refs">
+  <div class="chdr"><div class="chdr-l"><div class="cico">🔖</div><span class="ctitle">참고문헌</span></div><button class="cbtn" onclick="openCP(event,'refs')">🎨</button></div>
+  <div class="cbody">
+    <div class="f f-ref" id="f-refs" contenteditable="true" spellcheck="false" data-ph="[1] 저자 (연도). 제목. 출처 URL&#10;[2] ..." data-fk="refs" data-fs="11" oninput="as()"></div>
+  </div>
+</div>
+
+</div><!-- /pbody -->
+
+<div id="pfoot">
+  <span class="f-l">기후변화 탐구 포스터</span>
+  <span class="f-r">2026</span>
+</div>
+
+</div></div>
+<div id="toast"></div>
+
+<script>
+function sanitize(s){ return (s||'').trim().toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,20); }
+window._sanitize = sanitize;
+function onMetaInput(){ updateBadge(); }
+function onTopicChange(){ updateBadge(); as(); }
+
+window.clearPoster = function clearPoster(){
+  const fields=['f-title','f-motive','f-question','f-hypo','f-bg1','f-bg2','f-proc','f-data','f-conc','f-climlink','f-disc','f-newq','f-refs'];
+  fields.forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
+  ['m-members','m-date'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.querySelectorAll('.pslot').forEach(slot=>{
+    slot.dataset.img=''; slot.classList.remove('has');
+    const img=slot.querySelector('img'); if(img) img.remove();
+    if(!slot.querySelector('.pph')){
+      const ph=document.createElement('div'); ph.className='pph';
+      ph.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M8.5 5 10 3h4l1.5 2"/></svg><span>클릭하여 추가</span>`;
+      slot.insertBefore(ph, slot.querySelector('.pov'));
+    }
+  });
+  document.querySelectorAll('.pcap').forEach(cap=>cap.innerText='');
+  document.querySelectorAll('.card[data-sid] .chdr').forEach(el=>el.style.background='');
+}
+
+function updateBadge(){
+  const school=sanitize(document.getElementById('sel-school')?.value||'');
+  const group=sanitize(document.getElementById('sel-group')?.value||'');
+  const t=document.getElementById('sel-topic').value;
+  const tag = (school||group) ? `[${school||'?'}/${group||'?'}]` : '';
+  document.getElementById('h-badge').textContent = t ? `${tag} ${t}`.trim() : (tag?`${tag} 주제 미선택`:'학교코드·모둠코드·주제를 선택해주세요');
+  document.getElementById('tdisplay').textContent = t ? t.replace(/^[^\uAC00-\uD7A3a-zA-Z0-9]+/,'').slice(0,12) : (tag||'미연결');
+}
+
+function fbConnect(){ if(window._fb_connect) window._fb_connect(); else localConnect(); }
+function localConnect(){
+  const school=sanitize(document.getElementById('sel-school').value);
+  const group=sanitize(document.getElementById('sel-group').value);
+  if(!school){toast('학교 코드를 입력하세요','w');return;}
+  if(!group){toast('모둠 코드를 입력하세요','w');return;}
+  updateBadge(); toast(`[${school}/${group}] 설정됨 (로컬)`,'ok');
+}
+function fbSave(){ if(window._fb_save) window._fb_save(); else toast('Firebase 설정 필요','w'); }
+function as(){ if(window._autosave) window._autosave(); }
+function setSyncDot(on){ document.getElementById('sdot').className=on?'on':''; }
+
+let curField=null, ftTimer=null;
+document.addEventListener('focusin', e=>{
+  const f=e.target.closest('.f'); if(!f)return;
+  curField=f; clearTimeout(ftTimer);
+  const ft=document.getElementById('ftb'); ft.classList.add('on');
+  const r=f.getBoundingClientRect(); const ftH=44;
+  let top=r.top-ftH-6;
+  if(top<58) top=r.bottom+6;
+  if(top+ftH>window.innerHeight-10) top=window.innerHeight-ftH-10;
+  ft.style.top=top+'px';
+  ft.style.left=Math.min(Math.max(r.left,8), window.innerWidth-278)+'px';
+  document.getElementById('fsz-val').textContent=(f.dataset.fs||'13')+'px';
+});
+document.addEventListener('focusout', ()=>{ ftTimer=setTimeout(()=>{ if(!document.activeElement?.closest('#ftb')) document.getElementById('ftb').classList.remove('on'); },180); });
+document.getElementById('ftb').addEventListener('mousedown',e=>e.preventDefault());
+function fsz(d){ if(!curField)return; fszSet(Math.max(9,Math.min(32,parseInt(curField.dataset.fs||"13")+d))); }
+function fszSet(s){ if(!curField)return; curField.dataset.fs=s; curField.style.fontSize=s+'px'; document.getElementById('fsz-val').textContent=s+'px'; as(); }
+
+const SWATCHES=['linear-gradient(90deg,#0b3d6b,#1565a8)','linear-gradient(90deg,#1a2a5e,#2a4aaa)','linear-gradient(90deg,#0d2137,#0b5ea8)','linear-gradient(90deg,#0c5a5a,#0c8a7a)','linear-gradient(90deg,#1a5c38,#1a8a50)','linear-gradient(90deg,#0a3828,#1a7a50)','linear-gradient(90deg,#8c2e08,#c04818)','linear-gradient(90deg,#7a1a10,#c03020)','linear-gradient(90deg,#a04010,#d06820)','linear-gradient(90deg,#381860,#6030a0)','linear-gradient(90deg,#2a1050,#5828a0)','linear-gradient(90deg,#4a1060,#8020a0)','linear-gradient(90deg,#1a1a2e,#2a2a50)','linear-gradient(90deg,#1e2a38,#2a4060)','linear-gradient(90deg,#252525,#404060)','linear-gradient(90deg,#5a3800,#a06800)','linear-gradient(90deg,#6a3010,#b05020)','linear-gradient(90deg,#3a2800,#806000)'];
+let curSid=null;
+(()=>{ const sw=document.getElementById('cp-sw'); SWATCHES.forEach(c=>{ const d=document.createElement('div'); d.className='sw'; d.style.background=c; d.style.border='2px solid rgba(255,255,255,0.15)'; d.onclick=()=>applyColor(c); sw.appendChild(d); }); })();
+function openCP(e, sid){ e.stopPropagation(); curSid=sid; const p=document.getElementById('cpop'); const r=e.currentTarget.getBoundingClientRect(); p.style.top=(r.bottom+window.scrollY+5)+'px'; p.style.left=Math.min(r.left, window.innerWidth-220)+'px'; p.classList.add('on'); }
+function applyColor(c){ if(!curSid)return; const el=document.querySelector(`.card[data-sid="${curSid}"] .chdr`); if(el) el.style.background=c; as(); }
+function resetColor(){ if(!curSid)return; const el=document.querySelector(`.card[data-sid="${curSid}"] .chdr`); if(el) el.style.background=''; document.getElementById('cpop').classList.remove('on'); as(); }
+document.addEventListener('click',e=>{ if(!e.target.closest('#cpop')&&!e.target.closest('.cbtn')) document.getElementById('cpop').classList.remove('on'); });
+
+function initPhotoSlots(){ const area=document.getElementById('photo-area'); area.innerHTML=''; for(let i=0;i<4;i++) createSlot(area); }
+function createSlot(area){
+  const wrap=document.createElement('div'); wrap.className='ps';
+  const slot=document.createElement('div'); slot.className='pslot'; slot.dataset.img='';
+  slot.innerHTML=`<div class="pph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M8.5 5 10 3h4l1.5 2"/></svg><span>클릭하여 추가</span></div><div class="pov"><span>🔄 교체</span></div><input type="file" accept="image/*" style="display:none">`;
+  const inp=slot.querySelector('input');
+  slot.addEventListener('click',()=>inp.click());
+  inp.addEventListener('change',e=>{
+    const f=e.target.files[0]; if(!f)return;
+    const img=new Image(), url=URL.createObjectURL(f);
+    img.onload=()=>{
+      const canvas=document.createElement('canvas'); const max=600; let w=img.width,h=img.height;
+      if(w>max){h=h*max/w;w=max;} canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const data=canvas.toDataURL('image/jpeg',.75);
+      slot.dataset.img=data; renderPhoto(slot,data); as(); URL.revokeObjectURL(url);
+    };
+    img.src=url;
+  });
+  const cap=document.createElement('div'); cap.className='pcap'; cap.contentEditable='true'; cap.spellcheck=false; cap.oninput=as;
+  wrap.appendChild(slot); wrap.appendChild(cap); area.appendChild(wrap);
+}
+function renderPhoto(slot,src){ let img=slot.querySelector('img'); if(!img){img=document.createElement('img');slot.insertBefore(img,slot.firstChild);} img.src=src; slot.querySelector('.pph')?.remove(); slot.classList.add('has'); }
+initPhotoSlots();
+
+function collectLocal(){
+  const photos=[],caps=[];
+  document.querySelectorAll('.ps').forEach(w=>{ photos.push(w.querySelector('.pslot').dataset.img||''); caps.push(w.querySelector('.pcap').innerText||''); });
+  const sz={},cl={};
+  document.querySelectorAll('[data-fk]').forEach(e=>sz[e.dataset.fk]=e.dataset.fs||'13');
+  document.querySelectorAll('.card[data-sid]').forEach(e=>cl[e.dataset.sid]=e.querySelector('.chdr').style.background||'');
+  const g=id=>document.getElementById(id)?.innerHTML||''; const v=id=>document.getElementById(id)?.value||'';
+  return { title:g('f-title'), members:v('m-members'), date:v('m-date'),
+    school:v('sel-school'), group:v('sel-group'), topic:v('sel-topic'),
+    motive:g('f-motive'), question:g('f-question'), hypo:g('f-hypo'),
+    bg1:g('f-bg1'), bg2:g('f-bg2'), proc:g('f-proc'), data:g('f-data'),
+    conc:g('f-conc'), climlink:g('f-climlink'), disc:g('f-disc'),
+    refs:g('f-refs'), newq:g('f-newq'), photos, caps, sz, cl, savedAt:new Date().toISOString() };
+}
+function applyLocal(d){
+  const sh=(id,h)=>{const e=document.getElementById(id);if(e)e.innerHTML=h||'';};
+  const sv=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v||'';};
+  sh('f-title',d.title); sv('m-members',d.members); sv('m-date',d.date);
+  sv('sel-school',d.school||''); sv('sel-group',d.group||''); sv('sel-topic',d.topic||'');
+  updateBadge();
+  ['motive','question','hypo','bg1','bg2','proc','data','conc','climlink','disc','newq','refs'].forEach(k=>sh('f-'+k, d[k]||''));
+  if(d.sz) Object.entries(d.sz).forEach(([k,v])=>{ const el=document.querySelector(`[data-fk="${k}"]`); if(el){el.dataset.fs=v;el.style.fontSize=v+'px';} });
+  if(d.cl) Object.entries(d.cl).forEach(([k,v])=>{ const el=document.querySelector(`.card[data-sid="${k}"] .chdr`); if(el&&v)el.style.background=v; });
+  if(d.photos?.length){
+    const slots=document.querySelectorAll('.pslot');
+    slots.forEach((slot,i)=>{ if(d.photos[i]){slot.dataset.img=d.photos[i];renderPhoto(slot,d.photos[i]);} });
+    document.querySelectorAll('.pcap').forEach((cap,i)=>{ if(d.caps?.[i]) cap.innerText=d.caps[i]; });
+  }
+}
+function dlJSON(){
+  const t=(document.getElementById('sel-topic').value||'미선택').replace(/[^\uAC00-\uD7A3a-zA-Z0-9]/g,'')||'주제';
+  const s=sanitize(document.getElementById('sel-school').value)||'학교';
+  const g=sanitize(document.getElementById('sel-group').value)||'모둠';
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(collectLocal(),null,2)],{type:'application/json'}));
+  a.download=`포스터_${s}_${g}_${t}.json`; a.click(); toast('💾 백업 완료','ok');
+}
+function ldJSON(ev){
+  const f=ev.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{ try{ applyLocal(JSON.parse(e.target.result)); toast('📂 불러오기 완료','ok'); } catch{ toast('파일 오류','e'); } };
+  r.readAsText(f);
+}
+
+let toastT;
+function toast(msg,type='ok'){
+  const el=document.getElementById('toast'); el.textContent=msg; el.className='on '+type;
+  clearTimeout(toastT); toastT=setTimeout(()=>el.className='',2200);
+  if(type==='ok') setSyncDot(true);
+}
+</script>
+</body>
+</html>
